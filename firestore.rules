@@ -1,0 +1,33 @@
+rules_version = '2';
+
+// StudyMate HSC — Firestore security rules
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    function signedIn() {
+      return request.auth != null;
+    }
+    function isOwner(uid) {
+      return signedIn() && request.auth.uid == uid;
+    }
+
+    // Users can only read and write their own profile and sub-collections.
+    match /users/{uid} {
+      allow read, write: if isOwner(uid);
+
+      match /attempts/{attemptId} {
+        allow read, write: if isOwner(uid);
+      }
+      match /sessions/{sessionId} {
+        allow read, write: if isOwner(uid);
+      }
+    }
+
+    // The shared question bank is world-readable to signed-in users and only
+    // writable by trusted server/admin processes (never from the client).
+    match /questions/{id} {
+      allow read: if signedIn();
+      allow write: if false;
+    }
+  }
+}

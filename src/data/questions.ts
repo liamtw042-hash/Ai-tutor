@@ -1,0 +1,960 @@
+import type { Question } from "@/types";
+
+// ---------------------------------------------------------------------------
+// Seed question bank — 50 HSC-style questions (5 per subject).
+// Questions are modelled on the style and demands of NSW NESA HSC papers and
+// reference the relevant syllabus outcome codes. They are original items.
+// ---------------------------------------------------------------------------
+
+export const QUESTIONS: Question[] = [
+  // ======================= MATHEMATICS ADVANCED =======================
+  {
+    id: "math-adv-1",
+    subjectId: "math-adv",
+    topic: "Calculus",
+    type: "multiple-choice",
+    marks: 1,
+    difficulty: "standard",
+    prompt: "What is the derivative of f(x) = x·ln(x)?",
+    options: ["ln(x)", "1 + ln(x)", "1/x", "x + ln(x)"],
+    correctIndex: 1,
+    outcomes: ["MA-C2"],
+    solution:
+      "Using the product rule with u = x and v = ln(x): f'(x) = (1)·ln(x) + x·(1/x) = ln(x) + 1.",
+  },
+  {
+    id: "math-adv-2",
+    subjectId: "math-adv",
+    topic: "Statistical Analysis",
+    type: "multiple-choice",
+    marks: 1,
+    difficulty: "standard",
+    prompt:
+      "A set of scores is normally distributed with a mean of 60 and a standard deviation of 8. Approximately what percentage of scores lie between 52 and 76?",
+    options: ["68%", "81.5%", "95%", "99.7%"],
+    correctIndex: 1,
+    outcomes: ["MA-S5"],
+    solution:
+      "52 is 1 SD below the mean and 76 is 2 SD above. Using the empirical rule: 34% (mean to −1 SD) + 47.5% (mean to +2 SD) = 81.5%.",
+  },
+  {
+    id: "math-adv-3",
+    subjectId: "math-adv",
+    topic: "Calculus",
+    type: "short-answer",
+    marks: 3,
+    difficulty: "standard",
+    prompt:
+      "Find the equation of the tangent to the curve y = x² − 4x + 1 at the point where x = 3.",
+    outcomes: ["MA-C1", "MA-C2"],
+    solution:
+      "At x = 3, y = 9 − 12 + 1 = −2, so the point is (3, −2). y' = 2x − 4, so gradient at x = 3 is 2(3) − 4 = 2. Tangent: y − (−2) = 2(x − 3), giving y = 2x − 8.",
+    markingCriteria: [
+      "3 marks — correct point, correct gradient, correct tangent equation",
+      "2 marks — correct gradient and substitution with one arithmetic slip",
+      "1 mark — differentiates correctly OR finds the point correctly",
+    ],
+  },
+  {
+    id: "math-adv-4",
+    subjectId: "math-adv",
+    topic: "Financial Mathematics",
+    type: "short-answer",
+    marks: 3,
+    difficulty: "standard",
+    prompt:
+      "Priya deposits $200 at the end of each month into an account earning 6% p.a. compounded monthly. Using the future value of an annuity, find the value of the investment after 2 years. Give your answer to the nearest dollar.",
+    outcomes: ["MA-M1"],
+    solution:
+      "Monthly rate r = 0.06/12 = 0.005, n = 24. FV = 200 × [((1.005)^24 − 1)/0.005]. (1.005)^24 ≈ 1.127160, so FV ≈ 200 × (0.127160/0.005) ≈ 200 × 25.432 ≈ $5086.",
+    markingCriteria: [
+      "3 marks — correct annuity formula, correct substitution and answer ≈ $5086",
+      "2 marks — correct method with an arithmetic or rounding error",
+      "1 mark — identifies the correct future-value-of-annuity approach",
+    ],
+  },
+  {
+    id: "math-adv-5",
+    subjectId: "math-adv",
+    topic: "Functions",
+    type: "extended-response",
+    marks: 5,
+    difficulty: "challenge",
+    prompt:
+      "The function f(x) = x³ − 3x² − 9x + 5 is defined for all real x.\n(a) Find the coordinates of the stationary points and determine their nature. (3 marks)\n(b) Hence sketch the curve, showing the stationary points. (2 marks)",
+    outcomes: ["MA-C3"],
+    solution:
+      "(a) f'(x) = 3x² − 6x − 9 = 3(x − 3)(x + 1) = 0 ⇒ x = 3 or x = −1. f(−1) = −1 − 3 + 9 + 5 = 10 → (−1, 10); f(3) = 27 − 27 − 27 + 5 = −22 → (3, −22). f''(x) = 6x − 6: f''(−1) = −12 < 0 → maximum; f''(3) = 12 > 0 → minimum.\n(b) A positive cubic with a local max at (−1, 10) and local min at (3, −22), crossing the y-axis at (0, 5).",
+    markingCriteria: [
+      "5 marks — correct stationary points, correct nature via 2nd derivative, and a correct sketch",
+      "3–4 marks — correct stationary points and nature; sketch has minor omissions",
+      "1–2 marks — differentiates and solves f'(x)=0, or identifies nature only",
+    ],
+  },
+
+  // ======================= MATHEMATICS EXTENSION 1 =======================
+  {
+    id: "math-ext1-1",
+    subjectId: "math-ext1",
+    topic: "Combinatorics",
+    type: "multiple-choice",
+    marks: 1,
+    difficulty: "standard",
+    prompt:
+      "In how many ways can the letters of the word STUDENT be arranged in a row?",
+    options: ["5040", "2520", "1260", "720"],
+    correctIndex: 1,
+    outcomes: ["ME-A1"],
+    solution:
+      "STUDENT has 7 letters with T repeated twice. Arrangements = 7!/2! = 5040/2 = 2520.",
+  },
+  {
+    id: "math-ext1-2",
+    subjectId: "math-ext1",
+    topic: "Vectors",
+    type: "multiple-choice",
+    marks: 1,
+    difficulty: "standard",
+    prompt:
+      "Given a = 3i − 4j, what is the unit vector in the direction of a?",
+    options: [
+      "3i − 4j",
+      "(3/5)i − (4/5)j",
+      "(1/7)(3i − 4j)",
+      "(3/25)i − (4/25)j",
+    ],
+    correctIndex: 1,
+    outcomes: ["ME-V1"],
+    solution:
+      "|a| = √(3² + (−4)²) = √25 = 5. Unit vector = a/|a| = (3i − 4j)/5 = (3/5)i − (4/5)j.",
+  },
+  {
+    id: "math-ext1-3",
+    subjectId: "math-ext1",
+    topic: "Proof",
+    type: "short-answer",
+    marks: 3,
+    difficulty: "challenge",
+    prompt:
+      "Use mathematical induction to prove that 1 + 3 + 5 + … + (2n − 1) = n² for all positive integers n.",
+    outcomes: ["ME-P1"],
+    solution:
+      "Base case n = 1: LHS = 1, RHS = 1² = 1. True. Assume true for n = k: 1 + 3 + … + (2k − 1) = k². For n = k + 1: sum = k² + (2(k+1) − 1) = k² + 2k + 1 = (k + 1)². Hence true for k + 1. By induction it holds for all positive integers n.",
+    markingCriteria: [
+      "3 marks — verifies base case, states inductive hypothesis, and completes the inductive step correctly",
+      "2 marks — correct base case and a substantially correct inductive step",
+      "1 mark — verifies the base case and states the hypothesis",
+    ],
+  },
+  {
+    id: "math-ext1-4",
+    subjectId: "math-ext1",
+    topic: "Further Calculus Skills",
+    type: "short-answer",
+    marks: 3,
+    difficulty: "standard",
+    prompt: "Evaluate ∫ from 0 to 1 of x·e^(x²) dx. Give an exact answer.",
+    outcomes: ["ME-C1"],
+    solution:
+      "Let u = x², du = 2x dx, so x dx = du/2. ∫ x·e^(x²) dx = (1/2)∫ e^u du = (1/2)e^(x²). Evaluated 0→1: (1/2)(e¹ − e⁰) = (1/2)(e − 1).",
+    markingCriteria: [
+      "3 marks — correct substitution, antiderivative and exact answer (e − 1)/2",
+      "2 marks — correct antiderivative with an evaluation error",
+      "1 mark — chooses an appropriate substitution u = x²",
+    ],
+  },
+  {
+    id: "math-ext1-5",
+    subjectId: "math-ext1",
+    topic: "Applications of Calculus",
+    type: "extended-response",
+    marks: 4,
+    difficulty: "challenge",
+    prompt:
+      "A particle moves in a straight line so that its displacement x metres from the origin at time t seconds is x = 2sin(2t).\n(a) Show that the acceleration satisfies ẍ = −4x. (2 marks)\n(b) State the amplitude and period of the motion. (2 marks)",
+    outcomes: ["ME-C3"],
+    solution:
+      "(a) ẋ = 4cos(2t), ẍ = −8sin(2t) = −4(2sin 2t) = −4x. This is SHM. (b) Amplitude = 2 m; period T = 2π/2 = π seconds.",
+    markingCriteria: [
+      "4 marks — correct double differentiation showing ẍ = −4x, plus correct amplitude and period",
+      "2–3 marks — establishes SHM relation OR correct amplitude and period with one error",
+      "1 mark — differentiates once correctly",
+    ],
+  },
+
+  // ======================= ENGLISH ADVANCED =======================
+  {
+    id: "english-adv-1",
+    subjectId: "english-adv",
+    topic: "Module A: Textual Conversations",
+    type: "multiple-choice",
+    marks: 1,
+    difficulty: "standard",
+    prompt:
+      "In the study of textual conversations, the term 'intertextuality' most precisely refers to:",
+    options: [
+      "The historical context in which a text was composed",
+      "The shaping of meaning in one text through its relationship with another text",
+      "The personal response a reader brings to a text",
+      "The use of figurative language within a single text",
+    ],
+    correctIndex: 1,
+    outcomes: ["EA12-3"],
+    solution:
+      "Intertextuality is the relationship between texts whereby one text shapes or reshapes the meaning of another — central to Module A's comparative study of resonances and dissonances.",
+  },
+  {
+    id: "english-adv-2",
+    subjectId: "english-adv",
+    topic: "Common Module: Texts and Human Experiences",
+    type: "short-answer",
+    marks: 4,
+    difficulty: "standard",
+    prompt:
+      "Analyse how a composer represents the complexity of an individual human experience in ONE text you have studied. Refer to specific textual detail. (4 marks)",
+    outcomes: ["EA12-1", "EA12-5"],
+    solution:
+      "A strong response names a specific text, identifies a paradox or complexity within an individual's experience (e.g. simultaneous hope and despair), and analyses how at least two techniques construct that complexity, integrating short embedded quotations.",
+    markingCriteria: [
+      "4 marks — perceptive analysis of how techniques represent a genuine complexity, with well-chosen textual evidence",
+      "3 marks — clear analysis of technique and effect with appropriate evidence",
+      "2 marks — describes the experience with some reference to technique",
+      "1 mark — makes a general point about the text with limited evidence",
+    ],
+  },
+  {
+    id: "english-adv-3",
+    subjectId: "english-adv",
+    topic: "Module B: Critical Study of Literature",
+    type: "short-answer",
+    marks: 5,
+    difficulty: "challenge",
+    prompt:
+      "'Textual integrity is what sustains a work's critical reputation.' To what extent does your prescribed text for Module B demonstrate textual integrity? (5 marks)",
+    outcomes: ["EA12-3", "EA12-7"],
+    solution:
+      "Effective responses define textual integrity (the unity and coherence of form, language and ideas), advance a thesis on the degree to which the text achieves it, and support the argument with close analysis of form and language across the whole text rather than isolated moments.",
+    markingCriteria: [
+      "5 marks — sustained, personal engagement with textual integrity, integrating precise analysis and critical judgement",
+      "3–4 marks — clear argument about textual integrity with relevant analysis",
+      "1–2 marks — general comments on the text with limited engagement with the concept",
+    ],
+  },
+  {
+    id: "english-adv-4",
+    subjectId: "english-adv",
+    topic: "Module C: The Craft of Writing",
+    type: "extended-response",
+    marks: 6,
+    difficulty: "challenge",
+    prompt:
+      "Use the following as the opening line of an imaginative piece: 'The last train had already gone.' Craft a piece of imaginative writing (approx. 500–600 words) that demonstrates deliberate control of language and structure to engage a responder. (6 marks)",
+    outcomes: ["EA12-5", "EA12-6"],
+    solution:
+      "High-range responses sustain a distinctive voice, use structural choices (e.g. shifts in time, motif, controlled pacing) purposefully, and employ precise, evocative language rather than cliché. The stimulus line should be integrated organically.",
+    markingCriteria: [
+      "6 marks — skilful, sustained control of language and structure; highly engaging and cohesive",
+      "4–5 marks — effective control of language with some deliberate structural choices",
+      "2–3 marks — attempts imaginative writing with variable control",
+      "1 mark — limited engagement with the task",
+    ],
+  },
+  {
+    id: "english-adv-5",
+    subjectId: "english-adv",
+    topic: "Common Module: Texts and Human Experiences",
+    type: "multiple-choice",
+    marks: 1,
+    difficulty: "foundation",
+    prompt:
+      "Which of the following best defines an 'anomaly' or 'paradox' of human behaviour as examined in the Common Module?",
+    options: [
+      "A widely shared and predictable human response",
+      "An inconsistency or contradiction that invites deeper reflection",
+      "A grammatical error in a character's speech",
+      "A historical fact that shapes a text",
+    ],
+    correctIndex: 1,
+    outcomes: ["EA12-1"],
+    solution:
+      "The Common Module invites students to consider anomalies, paradoxes and inconsistencies in human behaviour and motivations — contradictions that prompt reflection on the human experience.",
+  },
+
+  // ======================= ENGLISH STANDARD =======================
+  {
+    id: "english-std-1",
+    subjectId: "english-std",
+    topic: "Module A: Language, Identity and Culture",
+    type: "multiple-choice",
+    marks: 1,
+    difficulty: "foundation",
+    prompt:
+      "In Module A, 'Language, Identity and Culture', the central idea is that language:",
+    options: [
+      "Is only important for writing formal essays",
+      "Can shape, reflect and challenge an individual's sense of identity and culture",
+      "Has no effect on how people see themselves",
+      "Is the same across every culture",
+    ],
+    correctIndex: 1,
+    outcomes: ["EN12-3"],
+    solution:
+      "Module A explores how language both reflects and shapes personal and cultural identity, and how it can be used to include, exclude or empower.",
+  },
+  {
+    id: "english-std-2",
+    subjectId: "english-std",
+    topic: "Common Module: Texts and Human Experiences",
+    type: "short-answer",
+    marks: 4,
+    difficulty: "standard",
+    prompt:
+      "Explain how ONE related text of your own choosing represents an individual OR collective human experience. Refer to specific techniques. (4 marks)",
+    outcomes: ["EN12-1", "EN12-5"],
+    solution:
+      "A sound response names a related text, states whether it represents an individual or collective experience, and explains how at least two identified techniques (e.g. symbolism, tone, characterisation) convey that experience with textual reference.",
+    markingCriteria: [
+      "4 marks — clear explanation of technique and effect with well-chosen evidence",
+      "3 marks — explains the experience with reference to technique",
+      "2 marks — describes the text with limited technical reference",
+      "1 mark — general comment about the text",
+    ],
+  },
+  {
+    id: "english-std-3",
+    subjectId: "english-std",
+    topic: "Module B: Close Study of Literature",
+    type: "short-answer",
+    marks: 5,
+    difficulty: "standard",
+    prompt:
+      "How does the composer of your prescribed text use characterisation to develop a central concern of the text? (5 marks)",
+    outcomes: ["EN12-3", "EN12-7"],
+    solution:
+      "Strong responses identify a central concern (theme), select a character through whom it is developed, and analyse specific techniques of characterisation (dialogue, actions, contrast, narrative perspective) linked to that concern.",
+    markingCriteria: [
+      "5 marks — insightful analysis connecting characterisation to a central concern with strong evidence",
+      "3–4 marks — clear analysis with relevant textual detail",
+      "1–2 marks — describes a character with limited link to a concern",
+    ],
+  },
+  {
+    id: "english-std-4",
+    subjectId: "english-std",
+    topic: "Module C: The Craft of Writing",
+    type: "extended-response",
+    marks: 6,
+    difficulty: "standard",
+    prompt:
+      "Write a persuasive piece (approx. 500 words) arguing that 'small everyday choices shape who we become'. Use rhetorical devices deliberately to position your audience. (6 marks)",
+    outcomes: ["EN12-5", "EN12-6"],
+    solution:
+      "Effective responses sustain a persuasive voice, structure an argument with a clear line of reasoning, and use rhetorical devices (anaphora, rhetorical questions, inclusive language, anecdote) purposefully rather than decoratively.",
+    markingCriteria: [
+      "6 marks — highly effective, sustained persuasion with skilful control of language",
+      "4–5 marks — effective argument with some deliberate rhetorical choices",
+      "2–3 marks — attempts persuasion with variable control",
+      "1 mark — limited engagement with the task",
+    ],
+  },
+  {
+    id: "english-std-5",
+    subjectId: "english-std",
+    topic: "Common Module: Texts and Human Experiences",
+    type: "multiple-choice",
+    marks: 1,
+    difficulty: "foundation",
+    prompt:
+      "A composer uses first-person narration primarily to:",
+    options: [
+      "Provide an objective, unbiased account of events",
+      "Give the responder intimate access to one character's thoughts and feelings",
+      "Describe the physical setting in detail",
+      "Avoid expressing any emotion",
+    ],
+    correctIndex: 1,
+    outcomes: ["EN12-1"],
+    solution:
+      "First-person narration positions the responder to experience events through one character's perspective, creating intimacy and, often, a subjective or limited viewpoint.",
+  },
+
+  // ======================= BIOLOGY =======================
+  {
+    id: "biology-1",
+    subjectId: "biology",
+    topic: "Heredity",
+    type: "multiple-choice",
+    marks: 1,
+    difficulty: "standard",
+    prompt:
+      "In a cross between two heterozygous pea plants (Rr × Rr) where round (R) is dominant to wrinkled (r), what is the expected phenotypic ratio of the offspring?",
+    options: [
+      "1 round : 1 wrinkled",
+      "3 round : 1 wrinkled",
+      "9 round : 7 wrinkled",
+      "All round",
+    ],
+    correctIndex: 1,
+    outcomes: ["BIO12-12"],
+    solution:
+      "A monohybrid cross Rr × Rr gives genotypes 1 RR : 2 Rr : 1 rr. Since R is dominant, RR and Rr are round: 3 round : 1 wrinkled.",
+  },
+  {
+    id: "biology-2",
+    subjectId: "biology",
+    topic: "Infectious Disease",
+    type: "multiple-choice",
+    marks: 1,
+    difficulty: "foundation",
+    prompt:
+      "Which scientist's work provided key evidence for the germ theory of disease through experiments with swan-necked flasks?",
+    options: ["Robert Koch", "Louis Pasteur", "Alexander Fleming", "Gregor Mendel"],
+    correctIndex: 1,
+    outcomes: ["BIO12-13"],
+    solution:
+      "Louis Pasteur's swan-necked flask experiments demonstrated that microorganisms come from other microorganisms in the air, disproving spontaneous generation and supporting germ theory.",
+  },
+  {
+    id: "biology-3",
+    subjectId: "biology",
+    topic: "Homeostasis",
+    type: "short-answer",
+    marks: 4,
+    difficulty: "standard",
+    prompt:
+      "Explain how the body responds to a decrease in core body temperature to return it to the normal range. Refer to the role of receptors, the control centre and effectors. (4 marks)",
+    outcomes: ["BIO12-14"],
+    solution:
+      "Thermoreceptors in the skin and hypothalamus detect the fall in temperature (stimulus). The hypothalamus (control centre) processes this and signals effectors: skeletal muscles shiver to generate heat, and skin arterioles vasoconstrict to reduce heat loss. This raises core temperature back toward the set point — a negative feedback response.",
+    markingCriteria: [
+      "4 marks — correctly describes receptor detection, hypothalamic control, at least two effector responses, and identifies negative feedback",
+      "3 marks — describes the pathway with a minor omission",
+      "2 marks — identifies some components of the response",
+      "1 mark — states a single relevant response (e.g. shivering)",
+    ],
+  },
+  {
+    id: "biology-4",
+    subjectId: "biology",
+    topic: "Genetic Change",
+    type: "short-answer",
+    marks: 5,
+    difficulty: "challenge",
+    prompt:
+      "Assess the use of CRISPR-Cas9 as a tool for genetic engineering, including one benefit and one ethical concern. (5 marks)",
+    outcomes: ["BIO12-13", "BIO12-15"],
+    solution:
+      "CRISPR-Cas9 uses a guide RNA to direct the Cas9 enzyme to a target DNA sequence, allowing precise cutting and editing. Benefit: it is faster, cheaper and more precise than earlier techniques, enabling potential correction of disease-causing alleles. Ethical concern: heritable germline editing raises questions about consent of future generations and 'designer' traits. An 'assess' answer weighs these to reach a judgement.",
+    markingCriteria: [
+      "5 marks — accurate mechanism, clear benefit and ethical concern, and a supported judgement",
+      "3–4 marks — describes CRISPR with a benefit and a concern; limited judgement",
+      "1–2 marks — general statement about genetic engineering",
+    ],
+  },
+  {
+    id: "biology-5",
+    subjectId: "biology",
+    topic: "Non-infectious Disease and Disorders",
+    type: "extended-response",
+    marks: 6,
+    difficulty: "challenge",
+    prompt:
+      "Analyse how epidemiological studies contribute to the management of a named non-infectious disease. Include reference to the type of data collected and how it informs public health strategies. (6 marks)",
+    outcomes: ["BIO12-14", "BIO12-15"],
+    solution:
+      "Using e.g. type 2 diabetes or lung cancer: epidemiology studies patterns, causes and effects of disease in populations. Data such as incidence, prevalence and risk-factor correlations (e.g. smoking and lung cancer) identify at-risk groups and causal links. This informs education campaigns, screening programs and policy (e.g. tobacco taxation), reducing incidence over time. A strong answer links specific data to specific interventions.",
+    markingCriteria: [
+      "6 marks — thorough analysis linking specific epidemiological data to management strategies for a named disease",
+      "4–5 marks — clear links between data and strategies with a named disease",
+      "2–3 marks — describes epidemiology or a disease with limited linkage",
+      "1 mark — makes a general relevant statement",
+    ],
+  },
+
+  // ======================= CHEMISTRY =======================
+  {
+    id: "chemistry-1",
+    subjectId: "chemistry",
+    topic: "Equilibrium and Acid Reactions",
+    type: "multiple-choice",
+    marks: 1,
+    difficulty: "standard",
+    prompt:
+      "For the exothermic equilibrium N₂(g) + 3H₂(g) ⇌ 2NH₃(g), which change will increase the yield of ammonia?",
+    options: [
+      "Increasing the temperature",
+      "Decreasing the pressure",
+      "Increasing the pressure",
+      "Removing hydrogen gas",
+    ],
+    correctIndex: 2,
+    outcomes: ["CH12-12"],
+    solution:
+      "By Le Chatelier's principle, increasing pressure favours the side with fewer gas moles (2 mol NH₃ vs 4 mol reactant), shifting right and increasing yield. Higher temperature would favour the endothermic reverse reaction.",
+  },
+  {
+    id: "chemistry-2",
+    subjectId: "chemistry",
+    topic: "Acid/Base Reactions",
+    type: "multiple-choice",
+    marks: 1,
+    difficulty: "standard",
+    prompt: "What is the pH of a 0.010 mol L⁻¹ solution of HCl at 25 °C?",
+    options: ["1", "2", "10", "12"],
+    correctIndex: 1,
+    outcomes: ["CH12-13"],
+    solution:
+      "HCl is a strong monoprotic acid so [H⁺] = 0.010 = 1 × 10⁻². pH = −log₁₀(1 × 10⁻²) = 2.",
+  },
+  {
+    id: "chemistry-3",
+    subjectId: "chemistry",
+    topic: "Acid/Base Reactions",
+    type: "short-answer",
+    marks: 4,
+    difficulty: "standard",
+    prompt:
+      "A 25.0 mL sample of sodium hydroxide solution is exactly neutralised by 20.0 mL of 0.100 mol L⁻¹ hydrochloric acid. Calculate the concentration of the sodium hydroxide solution. (4 marks)",
+    outcomes: ["CH12-13"],
+    solution:
+      "n(HCl) = c × V = 0.100 × 0.0200 = 2.00 × 10⁻³ mol. The reaction NaOH + HCl → NaCl + H₂O is 1:1, so n(NaOH) = 2.00 × 10⁻³ mol. c(NaOH) = n/V = 2.00 × 10⁻³ / 0.0250 = 0.0800 mol L⁻¹.",
+    markingCriteria: [
+      "4 marks — correct mole calculation, 1:1 ratio, and concentration 0.0800 mol L⁻¹ with units",
+      "3 marks — correct method with a rounding or unit error",
+      "2 marks — calculates moles of HCl correctly",
+      "1 mark — writes a balanced equation or correct formula",
+    ],
+  },
+  {
+    id: "chemistry-4",
+    subjectId: "chemistry",
+    topic: "Organic Chemistry",
+    type: "short-answer",
+    marks: 3,
+    difficulty: "standard",
+    prompt:
+      "Draw or describe the structural difference between an alkane and an alkene, and explain how this difference is tested using bromine water. (3 marks)",
+    outcomes: ["CH12-14"],
+    solution:
+      "Alkanes contain only single C–C bonds (saturated); alkenes contain at least one C=C double bond (unsaturated). Bromine water (orange/brown) is rapidly decolourised by an alkene via an addition reaction across the double bond, but remains coloured with an alkane (which only reacts slowly by substitution in UV light).",
+    markingCriteria: [
+      "3 marks — correct saturated/unsaturated distinction and correct decolourisation test with reasoning",
+      "2 marks — correct structural difference and a partial test description",
+      "1 mark — states one correct point",
+    ],
+  },
+  {
+    id: "chemistry-5",
+    subjectId: "chemistry",
+    topic: "Applying Chemical Ideas",
+    type: "extended-response",
+    marks: 5,
+    difficulty: "challenge",
+    prompt:
+      "Describe how atomic absorption spectroscopy (AAS) can be used to determine the concentration of a heavy-metal ion in a water sample, and evaluate its usefulness in monitoring environmental pollution. (5 marks)",
+    outcomes: ["CH12-15"],
+    solution:
+      "In AAS, the sample is atomised in a flame; ground-state atoms absorb light of a characteristic wavelength from a hollow-cathode lamp specific to the element. Absorbance is proportional to concentration (calibration curve from standards allows determination of the unknown). Evaluation: AAS is highly sensitive (ppb), element-specific and quantitative, making it excellent for detecting trace toxic metals; however it analyses one element at a time and requires standards and careful calibration.",
+    markingCriteria: [
+      "5 marks — correct principle, calibration method, and a balanced evaluation of usefulness",
+      "3–4 marks — describes AAS with some evaluation",
+      "1–2 marks — general statement about AAS or spectroscopy",
+    ],
+  },
+
+  // ======================= PHYSICS =======================
+  {
+    id: "physics-1",
+    subjectId: "physics",
+    topic: "Advanced Mechanics",
+    type: "multiple-choice",
+    marks: 1,
+    difficulty: "standard",
+    prompt:
+      "A projectile is launched at 20 m s⁻¹ at 30° above the horizontal. Taking g = 9.8 m s⁻², what is the vertical component of its initial velocity?",
+    options: ["10 m s⁻¹", "17.3 m s⁻¹", "20 m s⁻¹", "9.8 m s⁻¹"],
+    correctIndex: 0,
+    outcomes: ["PH12-12"],
+    solution:
+      "Vertical component u_y = u·sin θ = 20 × sin 30° = 20 × 0.5 = 10 m s⁻¹.",
+  },
+  {
+    id: "physics-2",
+    subjectId: "physics",
+    topic: "The Nature of Light",
+    type: "multiple-choice",
+    marks: 1,
+    difficulty: "challenge",
+    prompt:
+      "According to special relativity, as the speed of an object approaches the speed of light, an observer in the stationary frame measures the object's length to:",
+    options: [
+      "Increase without limit",
+      "Contract along the direction of motion",
+      "Remain unchanged",
+      "Contract in all directions equally",
+    ],
+    correctIndex: 1,
+    outcomes: ["PH12-14"],
+    solution:
+      "Length contraction: the measured length in the direction of motion decreases by a factor √(1 − v²/c²). Dimensions perpendicular to motion are unaffected.",
+  },
+  {
+    id: "physics-3",
+    subjectId: "physics",
+    topic: "Advanced Mechanics",
+    type: "short-answer",
+    marks: 4,
+    difficulty: "standard",
+    prompt:
+      "A 0.50 kg ball is whirled in a horizontal circle of radius 1.2 m at a constant speed of 4.0 m s⁻¹. Calculate the magnitude of the centripetal force acting on the ball and state its direction. (4 marks)",
+    outcomes: ["PH12-12"],
+    solution:
+      "F_c = mv²/r = 0.50 × (4.0)² / 1.2 = 0.50 × 16 / 1.2 = 8.0 / 1.2 ≈ 6.7 N. The force is directed toward the centre of the circle (centripetal).",
+    markingCriteria: [
+      "4 marks — correct formula, substitution, answer ≈ 6.7 N with units, and correct direction",
+      "3 marks — correct calculation but direction omitted or a unit error",
+      "2 marks — correct formula and substitution",
+      "1 mark — states the correct formula F = mv²/r",
+    ],
+  },
+  {
+    id: "physics-4",
+    subjectId: "physics",
+    topic: "Electromagnetism",
+    type: "short-answer",
+    marks: 4,
+    difficulty: "challenge",
+    prompt:
+      "Explain how a simple DC motor produces continuous rotation, referring to the motor effect and the role of the split-ring commutator. (4 marks)",
+    outcomes: ["PH12-13"],
+    solution:
+      "A current-carrying coil in a magnetic field experiences a force (F = BIL) on each side; the forces on opposite sides act in opposite directions, producing a torque that turns the coil (the motor effect). As the coil passes the vertical, the split-ring commutator reverses the direction of current in the coil, so the torque continues to act in the same rotational sense, giving continuous rotation.",
+    markingCriteria: [
+      "4 marks — explains the motor effect/torque AND the commutator's role in reversing current for continuous rotation",
+      "3 marks — explains torque and mentions the commutator with minor gaps",
+      "2 marks — describes the force on the coil",
+      "1 mark — states a relevant fact (e.g. F = BIL)",
+    ],
+  },
+  {
+    id: "physics-5",
+    subjectId: "physics",
+    topic: "From the Universe to the Atom",
+    type: "extended-response",
+    marks: 5,
+    difficulty: "challenge",
+    prompt:
+      "Assess the contribution of the Bohr model of the atom to our understanding of atomic spectra, including one success and one limitation of the model. (5 marks)",
+    outcomes: ["PH12-15"],
+    solution:
+      "Bohr proposed quantised electron orbits; electrons emit/absorb photons of energy ΔE = hf when moving between levels. Success: it accurately predicted the wavelengths of the hydrogen emission spectrum (Balmer series), explaining discrete spectral lines. Limitation: it failed for multi-electron atoms and could not explain the relative intensity or fine (hyperfine) splitting of spectral lines, later addressed by quantum mechanics. An 'assess' answer weighs these into a judgement of its significance.",
+    markingCriteria: [
+      "5 marks — correct model, a clear success and limitation, and a supported judgement",
+      "3–4 marks — describes the model with a success and limitation",
+      "1–2 marks — general statement about the Bohr model",
+    ],
+  },
+
+  // ======================= MODERN HISTORY =======================
+  {
+    id: "modern-history-1",
+    subjectId: "modern-history",
+    topic: "National Study: Germany 1918–1939",
+    type: "multiple-choice",
+    marks: 1,
+    difficulty: "foundation",
+    prompt:
+      "The 1919 Treaty of Versailles affected the Weimar Republic primarily by:",
+    options: [
+      "Granting Germany new colonies",
+      "Imposing reparations and territorial losses that fuelled political instability",
+      "Uniting the German people behind the new government",
+      "Ending all political extremism in Germany",
+    ],
+    correctIndex: 1,
+    outcomes: ["MH12-3"],
+    solution:
+      "The Treaty imposed reparations, territorial losses and the 'war guilt' clause. Resentment ('the stab in the back' / Diktat) undermined the Weimar Republic's legitimacy and fuelled extremism.",
+  },
+  {
+    id: "modern-history-2",
+    subjectId: "modern-history",
+    topic: "Power and Authority in the Modern World 1919–1946",
+    type: "multiple-choice",
+    marks: 1,
+    difficulty: "standard",
+    prompt:
+      "Which term best describes the Nazi policy of bringing all aspects of German society under party control?",
+    options: ["Appeasement", "Gleichschaltung", "Lebensraum", "Anschluss"],
+    correctIndex: 1,
+    outcomes: ["MH12-3"],
+    solution:
+      "Gleichschaltung ('coordination' or 'synchronisation') was the process of Nazifying German political, social and cultural institutions to consolidate totalitarian control.",
+  },
+  {
+    id: "modern-history-3",
+    subjectId: "modern-history",
+    topic: "National Study: Germany 1918–1939",
+    type: "short-answer",
+    marks: 5,
+    difficulty: "standard",
+    prompt:
+      "Explain the role of propaganda in maintaining the Nazi regime's control of Germany in the period 1933–1939. (5 marks)",
+    outcomes: ["MH12-6", "MH12-9"],
+    solution:
+      "Under Goebbels' Ministry of Propaganda, control of press, radio, film and mass rallies (e.g. Nuremberg) promoted the Führer cult and Nazi ideology, while censorship silenced dissent. Propaganda reinforced fear (alongside the SS/Gestapo) and manufactured consent, helping to legitimise policies and unify Volksgemeinschaft. A strong answer links specific methods to the effect of maintaining control.",
+    markingCriteria: [
+      "5 marks — explains several methods of propaganda and clearly links them to maintaining control, with historical detail",
+      "3–4 marks — describes propaganda methods with some link to control",
+      "1–2 marks — general statement about Nazi propaganda",
+    ],
+  },
+  {
+    id: "modern-history-4",
+    subjectId: "modern-history",
+    topic: "Peace and Conflict",
+    type: "short-answer",
+    marks: 5,
+    difficulty: "challenge",
+    prompt:
+      "To what extent was the policy of appeasement responsible for the outbreak of World War II in Europe? (5 marks)",
+    outcomes: ["MH12-5", "MH12-9"],
+    solution:
+      "A judgement-based response weighs appeasement (e.g. Munich 1938 allowing German expansion, emboldening Hitler) against other factors (the failures of the Treaty of Versailles, the League of Nations, the Great Depression, Hitler's own expansionist aims). A strong answer reaches a sustained 'to what extent' judgement rather than merely listing causes.",
+    markingCriteria: [
+      "5 marks — sustained argument weighing appeasement against other causes to reach a judgement, with evidence",
+      "3–4 marks — discusses appeasement and other factors with some judgement",
+      "1–2 marks — describes appeasement with limited argument",
+    ],
+  },
+  {
+    id: "modern-history-5",
+    subjectId: "modern-history",
+    topic: "Change in the Modern World",
+    type: "extended-response",
+    marks: 8,
+    difficulty: "challenge",
+    prompt:
+      "Assess the significance of leadership in shaping the outcome of ONE national or international struggle for change in the modern world that you have studied. (8 marks)",
+    outcomes: ["MH12-5", "MH12-6", "MH12-9"],
+    solution:
+      "A high-range response selects a specific struggle (e.g. the US Civil Rights Movement), advances a clear thesis on how significant leadership was relative to other factors (grassroots activism, media, legislation), and sustains an argument with accurate, well-selected evidence and historical understanding, reaching a considered judgement.",
+    markingCriteria: [
+      "7–8 marks — sustained, well-supported assessment of leadership's significance with a clear thesis and detailed evidence",
+      "5–6 marks — clear argument with relevant evidence and some judgement",
+      "3–4 marks — describes the struggle with limited assessment",
+      "1–2 marks — general or narrative response",
+    ],
+  },
+
+  // ======================= ECONOMICS =======================
+  {
+    id: "economics-1",
+    subjectId: "economics",
+    topic: "Economic Policies and Management",
+    type: "multiple-choice",
+    marks: 1,
+    difficulty: "standard",
+    prompt:
+      "If the Reserve Bank of Australia sells government securities in the open market, the most likely immediate effect is to:",
+    options: [
+      "Increase the supply of funds and lower the cash rate",
+      "Decrease the supply of funds and raise the cash rate",
+      "Have no effect on the cash rate",
+      "Directly reduce the unemployment rate",
+    ],
+    correctIndex: 1,
+    outcomes: ["ECO12-8"],
+    solution:
+      "Selling securities absorbs (reduces) the supply of exchange settlement funds in the money market, placing upward pressure on the cash rate — a contractionary (tightening) monetary operation.",
+  },
+  {
+    id: "economics-2",
+    subjectId: "economics",
+    topic: "The Global Economy",
+    type: "multiple-choice",
+    marks: 1,
+    difficulty: "foundation",
+    prompt:
+      "Which measure is most commonly used to compare the material standard of living between countries?",
+    options: [
+      "Nominal GDP",
+      "GDP per capita (PPP)",
+      "The exchange rate",
+      "The current account balance",
+    ],
+    correctIndex: 1,
+    outcomes: ["ECO12-1"],
+    solution:
+      "Real GDP per capita adjusted for purchasing power parity (PPP) accounts for population size and price differences, making it the standard measure for comparing material living standards across economies.",
+  },
+  {
+    id: "economics-3",
+    subjectId: "economics",
+    topic: "Economic Issues",
+    type: "short-answer",
+    marks: 4,
+    difficulty: "standard",
+    prompt:
+      "Distinguish between cyclical and structural unemployment, and provide one example of each. (4 marks)",
+    outcomes: ["ECO12-6"],
+    solution:
+      "Cyclical unemployment results from a downturn in the business cycle (deficient aggregate demand), e.g. job losses during a recession. Structural unemployment results from a mismatch between workers' skills/location and available jobs, often due to technological or industry change, e.g. manufacturing workers displaced by automation. Distinguishing requires stating the cause of each.",
+    markingCriteria: [
+      "4 marks — clear distinction by cause plus a correct example of each",
+      "3 marks — distinguishes both with one example",
+      "2 marks — defines both types OR one type with an example",
+      "1 mark — defines one type of unemployment",
+    ],
+  },
+  {
+    id: "economics-4",
+    subjectId: "economics",
+    topic: "Australia's Place in the Global Economy",
+    type: "short-answer",
+    marks: 5,
+    difficulty: "challenge",
+    prompt:
+      "Explain how a depreciation of the Australian dollar affects Australia's trade balance. (5 marks)",
+    outcomes: ["ECO12-4", "ECO12-7"],
+    solution:
+      "A depreciation makes exports cheaper in foreign currency (raising export competitiveness and quantity demanded) and imports more expensive in AUD (reducing import volumes). Over time this tends to improve the trade balance, though the J-curve effect means it may worsen initially before improving as quantities adjust. A strong answer explains the mechanism and may note elasticity/J-curve qualifications.",
+    markingCriteria: [
+      "5 marks — clear explanation of effects on both exports and imports, linked to the trade balance, with a qualification (e.g. J-curve/elasticities)",
+      "3–4 marks — explains the effect on exports and imports on the trade balance",
+      "1–2 marks — states that depreciation affects exports or imports",
+    ],
+  },
+  {
+    id: "economics-5",
+    subjectId: "economics",
+    topic: "Economic Policies and Management",
+    type: "extended-response",
+    marks: 8,
+    difficulty: "challenge",
+    prompt:
+      "Analyse the effectiveness of fiscal policy in achieving the Australian Government's economic objectives. Refer to at least two objectives in your response. (8 marks)",
+    outcomes: ["ECO12-8", "ECO12-10"],
+    solution:
+      "A high-range response defines fiscal policy (government use of the budget — spending and taxation), selects at least two objectives (e.g. economic growth, full employment, price stability, income distribution), and analyses fiscal policy's strengths (targeted, direct impact on AD, automatic stabilisers) and limitations (time lags, political constraints, crowding out, impact on the budget/debt), reaching a judgement supported by contemporary examples.",
+    markingCriteria: [
+      "7–8 marks — sustained analysis of fiscal policy effectiveness across two+ objectives, with strengths, limitations and current evidence",
+      "5–6 marks — clear analysis referring to objectives with some evaluation",
+      "3–4 marks — describes fiscal policy with limited analysis",
+      "1–2 marks — general statement about the budget",
+    ],
+  },
+
+  // ======================= BUSINESS STUDIES =======================
+  {
+    id: "business-studies-1",
+    subjectId: "business-studies",
+    topic: "Finance",
+    type: "multiple-choice",
+    marks: 1,
+    difficulty: "standard",
+    prompt:
+      "A business has current assets of $80,000 and current liabilities of $40,000. What is its current ratio, and what does it indicate?",
+    options: [
+      "0.5 : 1 — the business cannot meet short-term debts",
+      "2 : 1 — the business can comfortably meet short-term debts",
+      "40 : 1 — the business is highly geared",
+      "1 : 2 — the business is insolvent",
+    ],
+    correctIndex: 1,
+    outcomes: ["BUS12-5"],
+    solution:
+      "Current ratio = current assets ÷ current liabilities = 80,000 ÷ 40,000 = 2:1. This indicates strong liquidity — the business has $2 of current assets for every $1 of current liabilities.",
+  },
+  {
+    id: "business-studies-2",
+    subjectId: "business-studies",
+    topic: "Marketing",
+    type: "multiple-choice",
+    marks: 1,
+    difficulty: "foundation",
+    prompt: "The 'marketing mix' is best described as the combination of:",
+    options: [
+      "Price, promotion, place and product",
+      "People, process and physical evidence only",
+      "Sales, service and staffing",
+      "Cost, competition and consumers",
+    ],
+    correctIndex: 0,
+    outcomes: ["BUS12-6"],
+    solution:
+      "The traditional marketing mix is the 4 Ps: Product, Price, Promotion and Place. (Services marketing extends this to 7 Ps by adding people, process and physical evidence.)",
+  },
+  {
+    id: "business-studies-3",
+    subjectId: "business-studies",
+    topic: "Operations",
+    type: "short-answer",
+    marks: 4,
+    difficulty: "standard",
+    prompt:
+      "Explain how the operations strategy of 'supply chain management' can improve the efficiency of a manufacturing business. (4 marks)",
+    outcomes: ["BUS12-2", "BUS12-3"],
+    solution:
+      "Supply chain management (SCM) integrates the sourcing of inputs, logistics and delivery. By coordinating suppliers (e.g. through strategic partnerships and just-in-time delivery), a manufacturer reduces holding costs and waste, avoids stockouts, and improves reliability and lead times — lowering costs and increasing efficiency. A strong answer links a specific SCM practice to an efficiency outcome.",
+    markingCriteria: [
+      "4 marks — explains SCM and clearly links a practice to improved efficiency with reasoning",
+      "3 marks — describes SCM with some link to efficiency",
+      "2 marks — defines supply chain management",
+      "1 mark — makes a relevant point about operations",
+    ],
+  },
+  {
+    id: "business-studies-4",
+    subjectId: "business-studies",
+    topic: "Human Resources",
+    type: "short-answer",
+    marks: 5,
+    difficulty: "standard",
+    prompt:
+      "Explain how effective human resource management can contribute to the achievement of a business's objectives. (5 marks)",
+    outcomes: ["BUS12-3", "BUS12-4"],
+    solution:
+      "Effective HRM aligns the workforce with business goals through acquisition (recruiting suitable staff), development (training), maintenance (rewards, safety) and separation. Benefits include higher productivity, lower staff turnover, improved motivation and a positive corporate culture — supporting objectives such as profitability, growth and market share. A strong answer links HR functions to specific objectives.",
+    markingCriteria: [
+      "5 marks — links several HR functions to the achievement of specific business objectives with clear reasoning",
+      "3–4 marks — describes HR functions with some link to objectives",
+      "1–2 marks — general statement about human resources",
+    ],
+  },
+  {
+    id: "business-studies-5",
+    subjectId: "business-studies",
+    topic: "Finance",
+    type: "extended-response",
+    marks: 8,
+    difficulty: "challenge",
+    prompt:
+      "Analyse the impact of ethical and legal financial reporting on the effectiveness of a business's financial management. Refer to relevant financial management strategies in your response. (8 marks)",
+    outcomes: ["BUS12-3", "BUS12-5"],
+    solution:
+      "A high-range response explains that ethical and legal financial reporting (accurate records, compliance with the Corporations Act, audited statements) builds stakeholder trust and enables informed decision-making. It analyses links to strategies such as cash flow management, working capital and profitability management, and discusses risks of unethical practices (e.g. window dressing, misrepresentation) undermining financial control and reputation, reaching a supported judgement.",
+    markingCriteria: [
+      "7–8 marks — sustained analysis linking ethical/legal reporting to financial management strategies and effectiveness, with judgement",
+      "5–6 marks — clear analysis with reference to strategies",
+      "3–4 marks — describes reporting or strategies with limited analysis",
+      "1–2 marks — general relevant statement",
+    ],
+  },
+];
+
+// Convenience lookups -------------------------------------------------------
+
+export function questionsForSubject(subjectId: string): Question[] {
+  return QUESTIONS.filter((q) => q.subjectId === subjectId);
+}
+
+export function topicsForSubject(subjectId: string): string[] {
+  return Array.from(
+    new Set(questionsForSubject(subjectId).map((q) => q.topic)),
+  );
+}
+
+export function getQuestion(id: string): Question | undefined {
+  return QUESTIONS.find((q) => q.id === id);
+}

@@ -1,0 +1,242 @@
+import { useMemo, useState } from "react";
+import { Badge, Button, Card, EmptyState, Progress, cn } from "@/components/ui";
+import { DocIcon, SparkIcon, TargetIcon } from "@/components/icons";
+import { SUBJECTS, getSubject } from "@/data/subjects";
+import { useAuth } from "@/lib/auth";
+import { reviewEssay } from "@/lib/claude";
+import { canUse, incrementUsage, remaining } from "@/lib/usage";
+import type { EssayFeedback, SubjectId } from "@/types";
+
+const QUESTION_TYPES = [
+  "Essay / extended response",
+  "Common Module (Human Experiences)",
+  "Module A response",
+  "Module B response",
+  "Module C (Craft of Writing)",
+  "Source-based response",
+  "Business/Economics report",
+  "Short answer (extended)",
+];
+
+function bandTone(band: number, max: number): "green" | "amber" | "red" {
+  const r = band / max;
+  return r >= 0.66 ? "green" : r >= 0.4 ? "amber" : "red";
+}
+
+export default function Essay() {
+  const { profile } = useAuth();
+  const premium = profile?.premium ?? false;
+  const uid = profile?.uid ?? "demo";
+
+  const availableSubjects: SubjectId[] =
+    profile?.subjects?.length ? profile.subjects : SUBJECTS.map((s) => s.id);
+
+  const [subjectId, setSubjectId] = useState<SubjectId>(availableSubjects[0]);
+  const [questionType, setQuestionType] = useState(QUESTION_TYPES[0]);
+  const [essay, setEssay] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
+  const [fb, setFb] = useState<EssayFeedback | null>(null);
+
+  const subject = getSubject(subjectId);
+  const wordCount = useMemo(
+    () => essay.trim().split(/\s+/).filter(Boolean).length,
+    [essay],
+  );
+  const left = remaining(uid, "essay", premium);
+  const blocked = !canUse(uid, "essay", premium);
+
+  const submit = async () => {
+    if (blocked) {
+      setError(
+        "You've used your free essay reviews for today. Upgrade to Premium for unlimited detailed marking.",
+      );
+      return;
+    }
+    setError("");
+    setLoading(true);
+    setFb(null);
+    try {
+      const result = await reviewEssay(
+        subject.name,
+        questionType,
+        subject.bands,
+        essay,
+      );
+      setFb(result);
+      if (!premium) incrementUsage(uid, "essay");
+    } catch (err) {
+      setError(
+        err instanceof Error
+          ? err.message
+          : "Couldn't reach the marker. Essay feedback runs on a serverless function with an API key.",
+      );
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return (
+    <div className="space-y-6">
+      <div className="flex flex-col justify-between gap-3 sm:flex-row sm:items-center">
+        <div>
+          <h1 className="font-display text-3xl font-bold text-white">
+            Essay Feedback
+          </h1>
+          <p className="mt-1 text-ink-300">
+            Paste a response and get structured, NESA-aligned marking in seconds.
+          </p>
+        </div>
+        <Badge tone={premium ? "brand" : left > 0 ? "neutral" : "amber"}>
+          {premium ? (
+            <>
+              <SparkIcon className="h-3.5 w-3.5" /> Unlimited
+            </>
+          ) : (
+            `${Math.max(0, left)} free review${left === 1 ? "" : "s"} left`
+          )}
+        </Badge>
+      </div>
+
+      <div className="grid gap-6 lg:grid-cols-2">
+        {/* Input */}
+        <Card className="space-y-4">
+          <div className="grid gap-4 sm:grid-cols-2">
+            <div>
+              <label className="label">Subject</label>
+              <select
+                className="input"
+                value={subjectId}
+                onChange={(e) => setSubjectId(e.target.value as SubjectId)}
+              >
+                {availableSubjects.map((id) => (
+                  <option key={id} value={id}>
+                    {getSubject(id).name}
+                  </option>
+                ))}
+              </select>
+            </div>
+            <div>
+              <label className="label">Question type</label>
+              <select
+                className="input"
+                value={questionType}
+                onChange={(e) => setQuestionType(e.target.value)}
+              >
+                {QUESTION_TYPES.map((t) => (
+                  <option key={t} value={t}>
+                    {t}
+                  </option>
+                ))}
+              </select>
+            </div>
+          </div>
+          <div>
+            <label className="label">Your response</label>
+            <textarea
+              className="input min-h-[320px] resize-y font-normal leading-relaxed"
+              placeholder="Paste your essay or extended response here…"
+              value={essay}
+              onChange={(e) => setEssay(e.target.value)}
+            />
+          </div>
+          {error && (
+            <p className="rounded-lg border border-red-500/20 bg-red-500/10 px-3 py-2 text-sm text-red-300">
+              {error}
+            </p>
+          )}
+          <div className="flex items-center justify-between">
+            <span className="text-xs text-ink-500">{wordCount} words</span>
+            <Button onClick={submit} loading={loading} disabled={wordCount < 20}>
+              <SparkIcon className="h-4 w-4" /> Mark my response
+            </Button>
+          </div>
+        </Card>
+
+        {/* Feedback */}
+        <div>
+          {loading ? (
+            <Card className="h-full min-h-[420px] shimmer">{" "}</Card>
+          ) : !fb ? (
+            <Card className="flex h-full min-h-[420px] items-center justify-center">
+              <EmptyState
+                icon={<DocIcon className="h-6 w-6" />}
+                title="Your feedback will appear here"
+              >
+                Marked against NESA band descriptors across thesis, evidence,
+                analysis and expression.
+              </EmptyState>
+            </Card>
+          ) : (
+            <Card className="space-y-5">
+              {/* Overall band */}
+              <div className="flex items-center justify-between rounded-xl border border-white/10 bg-ink-850 p-4">
+                <div>
+                  <p className="text-sm text-ink-400">Estimated band</p>
+                  <p className="font-display text-3xl font-bold text-white">
+                    {fb.band}
+                    <span className="text-lg text-ink-500">/{fb.maxBand}</span>
+                  </p>
+                </div>
+                <div className="grid h-14 w-14 place-items-center rounded-full ring-4 ring-inset ring-brand-500/20">
+                  <TargetIcon className="h-6 w-6 text-brand-300" />
+                </div>
+              </div>
+
+              <p className="text-sm leading-relaxed text-ink-200">{fb.overall}</p>
+
+              {/* Criteria */}
+              <div className="space-y-3">
+                {fb.criteria.map((c) => (
+                  <div key={c.name}>
+                    <div className="mb-1 flex items-center justify-between">
+                      <span className="text-sm font-medium text-ink-100">
+                        {c.name}
+                      </span>
+                      <Badge tone={bandTone(c.score, c.max)}>
+                        {c.score}/{c.max}
+                      </Badge>
+                    </div>
+                    <Progress
+                      value={c.score / c.max}
+                      tone={bandTone(c.score, c.max)}
+                    />
+                    <p className="mt-1.5 text-xs leading-relaxed text-ink-400">
+                      {c.comment}
+                    </p>
+                  </div>
+                ))}
+              </div>
+
+              {/* Next steps */}
+              {fb.nextSteps?.length > 0 && (
+                <div className="rounded-xl border border-brand-500/20 bg-brand-500/5 p-4">
+                  <p className="mb-2 flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wide text-brand-300">
+                    <SparkIcon className="h-3.5 w-3.5" /> Priority next steps
+                  </p>
+                  <ol className="space-y-2">
+                    {fb.nextSteps.map((s, i) => (
+                      <li
+                        key={i}
+                        className="flex gap-2.5 text-sm text-ink-200"
+                      >
+                        <span
+                          className={cn(
+                            "grid h-5 w-5 shrink-0 place-items-center rounded-full bg-brand-500/20 text-[11px] font-bold text-brand-200",
+                          )}
+                        >
+                          {i + 1}
+                        </span>
+                        {s}
+                      </li>
+                    ))}
+                  </ol>
+                </div>
+              )}
+            </Card>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+}
