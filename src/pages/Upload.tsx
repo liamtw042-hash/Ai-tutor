@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useAuth } from "@/lib/auth";
+import { isPremium } from "@/lib/premium";
 import { analyzeWork } from "@/lib/claude";
 import {
   ACCEPT_ATTR,
@@ -48,7 +49,7 @@ const ACTIONS: {
 
 export default function UploadPage() {
   const { user, profile, configured, togglePremium } = useAuth();
-  const premium = profile?.premium ?? false;
+  const premium = isPremium(profile);
 
   const availableSubjects: SubjectId[] =
     profile?.subjects?.length ? profile.subjects : SUBJECTS.map((s) => s.id);
@@ -145,6 +146,8 @@ export default function UploadPage() {
           : { pdf: { data } };
       const { result: out } = await analyzeWork({
         action: a,
+        email: profile?.email,
+        premium,
         subjectName: getSubject(subjectId).name,
         stage,
         question: a === "ask" ? askText.trim() : undefined,

@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { useAuth } from "@/lib/auth";
+import { isPremium } from "@/lib/premium";
 import {
   addCard,
   awardBadges,
@@ -49,7 +50,7 @@ type StudyMode = "flip" | "write" | "match";
 export default function Flashcards() {
   const { user, profile, configured, refreshProfile } = useAuth();
   const uid = user?.uid ?? "";
-  const premium = profile?.premium ?? false;
+  const premium = isPremium(profile);
 
   const [decks, setDecks] = useState<Deck[]>([]);
   const [loading, setLoading] = useState(true);

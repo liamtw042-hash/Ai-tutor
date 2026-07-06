@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { useAuth } from "@/lib/auth";
+import { isPremium } from "@/lib/premium";
 import {
   fetchDayStats,
   fetchEssayRecords,
@@ -34,7 +35,7 @@ import type { DayStat, EssayRecord, LeaderboardEntry } from "@/types";
 
 export default function ProgressPage() {
   const { user, profile, configured, togglePremium, refreshProfile } = useAuth();
-  const premium = profile?.premium ?? false;
+  const premium = isPremium(profile);
 
   const [attempts, setAttempts] = useState<AttemptRow[]>([]);
   const [days, setDays] = useState<DayStat[]>([]);

@@ -1,5 +1,13 @@
 import type { VercelRequest, VercelResponse } from "@vercel/node";
-import { MODEL, anthropic, fail, methodGuard, readBody, textOf } from "./_lib.js";
+import {
+  MODEL,
+  anthropic,
+  fail,
+  methodGuard,
+  readBody,
+  requirePremium,
+  textOf,
+} from "./_lib.js";
 
 // POST /api/analyze — read a student's uploaded work (photo or PDF) with
 // Claude's vision / document understanding and help with it.
@@ -8,6 +16,9 @@ type Action = "explain" | "mark" | "generate" | "ask";
 
 interface Body {
   action: Action;
+  /** caller identity, used for the owner/premium check */
+  email?: string;
+  premium?: boolean;
   subjectName?: string;
   stage?: string;
   /** the student's own question (for the "ask" action) */
@@ -46,8 +57,11 @@ function instruction(action: Action, subject: string, level: string, question?: 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
   if (!methodGuard(req, res)) return;
   try {
-    const { action, subjectName, stage, question, image, pdf, text } =
-      readBody<Body>(req);
+    const body = readBody<Body>(req);
+    // Photo & document help is a Premium feature — enforce it here, not just
+    // in the UI. Owner/comp emails pass via requirePremium.
+    if (!requirePremium(res, body)) return;
+    const { action, subjectName, stage, question, image, pdf, text } = body;
 
     if (!action) {
       res.status(400).json({ error: "action is required" });

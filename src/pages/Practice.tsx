@@ -13,6 +13,7 @@ import { SUBJECTS, getSubject, topicsForYear } from "@/data/subjects";
 import { questionsForSubject } from "@/data/questions";
 import { DISCLAIMERS } from "@/data/nesa";
 import { useAuth } from "@/lib/auth";
+import { isPremium } from "@/lib/premium";
 import {
   awardXp,
   recordAttempt,
@@ -343,7 +344,7 @@ function GenerateModal({
 export default function Practice() {
   const { profile } = useAuth();
   const [params, setParams] = useSearchParams();
-  const premium = profile?.premium ?? false;
+  const premium = isPremium(profile);
   const uid = profile?.uid ?? "demo";
   const year: YearLevel = profile?.yearLevel ?? "year12";
   const stage = stageLabel(profile?.yearLevel);

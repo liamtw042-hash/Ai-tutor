@@ -6,12 +6,16 @@ import {
   methodGuard,
   parseJSON,
   readBody,
+  requirePremium,
   textOf,
 } from "./_lib.js";
 
 // POST /api/plan — generate a personalised week-by-week HSC study plan.
 
 interface Body {
+  /** caller identity, used for the owner/premium check */
+  email?: string;
+  premium?: boolean;
   exams: { subjectName: string; subjectId: string; date: string }[];
   hoursPerWeek: number;
   weakTopics: { subjectName: string; topic: string; accuracy: number }[];
@@ -38,7 +42,10 @@ export default async function handler(
 ) {
   if (!methodGuard(req, res)) return;
   try {
-    const { exams, hoursPerWeek, weakTopics, todayKey } = readBody<Body>(req);
+    const body = readBody<Body>(req);
+    // Study plans are a Premium feature — enforce server-side (owner bypass).
+    if (!requirePremium(res, body)) return;
+    const { exams, hoursPerWeek, weakTopics, todayKey } = body;
     if (!Array.isArray(exams) || exams.length === 0) {
       res.status(400).json({ error: "At least one exam date is required" });
       return;

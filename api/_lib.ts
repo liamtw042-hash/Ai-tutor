@@ -64,3 +64,48 @@ export function fail(res: VercelResponse, err: unknown): void {
   console.error("[studymate api]", message);
   res.status(500).json({ error: message });
 }
+
+// ---------------------------------------------------------------------------
+// Premium / owner access — server-side mirror of src/lib/premium.ts.
+//
+// Owner/comp emails always count as premium regardless of subscription. The
+// list is configured via OWNER_EMAILS (comma-separated), defaulting to the
+// owner's address. Premium-only endpoints call requirePremium() so access is
+// enforced on the server, not just hidden in the UI.
+// ---------------------------------------------------------------------------
+
+const DEFAULT_OWNER_EMAILS = "liamtw042@gmail.com";
+
+export function ownerEmails(): string[] {
+  const raw = process.env.OWNER_EMAILS;
+  return (raw && raw.trim() ? raw : DEFAULT_OWNER_EMAILS)
+    .split(",")
+    .map((e) => e.trim().toLowerCase())
+    .filter(Boolean);
+}
+
+export function isOwnerEmail(email?: string | null): boolean {
+  if (!email) return false;
+  return ownerEmails().includes(email.trim().toLowerCase());
+}
+
+/** True when a request should get premium access: real subscription OR owner. */
+export function isPremiumRequest(body: {
+  email?: string | null;
+  premium?: boolean;
+}): boolean {
+  return Boolean(body?.premium) || isOwnerEmail(body?.email);
+}
+
+/**
+ * Guard a premium-only endpoint. Responds 403 and returns false when the caller
+ * is neither a paid subscriber nor an owner/comp email.
+ */
+export function requirePremium(
+  res: VercelResponse,
+  body: { email?: string | null; premium?: boolean },
+): boolean {
+  if (isPremiumRequest(body)) return true;
+  res.status(403).json({ error: "This feature requires StudyMate Premium." });
+  return false;
+}

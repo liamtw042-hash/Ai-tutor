@@ -4,6 +4,7 @@ import { DocIcon, SparkIcon, TargetIcon } from "@/components/icons";
 import { SUBJECTS, getSubject } from "@/data/subjects";
 import { DISCLAIMERS } from "@/data/nesa";
 import { useAuth } from "@/lib/auth";
+import { isPremium } from "@/lib/premium";
 import { reviewEssay } from "@/lib/claude";
 import {
   awardXp,
@@ -36,7 +37,7 @@ function bandTone(band: number, max: number): "green" | "amber" | "red" {
 
 export default function Essay() {
   const { user, profile, configured } = useAuth();
-  const premium = profile?.premium ?? false;
+  const premium = isPremium(profile);
   const uid = profile?.uid ?? "demo";
 
   const availableSubjects: SubjectId[] =

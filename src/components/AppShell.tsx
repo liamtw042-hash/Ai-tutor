@@ -2,6 +2,7 @@ import { useState, type ReactNode } from "react";
 import { NavLink, useNavigate } from "react-router-dom";
 import { Logo } from "@/components/Logo";
 import { useAuth } from "@/lib/auth";
+import { isPremium } from "@/lib/premium";
 import { Badge, Button, Progress, cn } from "@/components/ui";
 import { levelProgress, levelTitle } from "@/lib/xp";
 import {
@@ -84,7 +85,7 @@ function NavItems({ onNavigate }: { onNavigate?: () => void }) {
               >
                 <Icon className="h-[18px] w-[18px]" />
                 <span className="flex-1">{label}</span>
-                {premium && !profile?.premium && (
+                {premium && !isPremium(profile) && (
                   <LockIcon className="h-3.5 w-3.5 text-ink-500" />
                 )}
               </NavLink>
@@ -145,7 +146,7 @@ function LevelCard() {
 
 function UpgradeCard() {
   const { profile, togglePremium } = useAuth();
-  if (profile?.premium) {
+  if (isPremium(profile)) {
     return (
       <div className="rounded-2xl border border-brand-500/25 bg-brand-500/10 p-4">
         <Badge tone="brand">
@@ -221,7 +222,7 @@ export function AppShell({ children }: { children: ReactNode }) {
                 {profile?.displayName || "Student"}
               </p>
               <p className="truncate text-xs text-ink-400">
-                {profile?.premium ? "Premium plan" : "Free plan"}
+                {isPremium(profile) ? "Premium plan" : "Free plan"}
               </p>
             </div>
             <button

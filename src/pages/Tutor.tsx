@@ -17,6 +17,7 @@ import {
 import { LogoMark } from "@/components/Logo";
 import { SUBJECTS, getSubject } from "@/data/subjects";
 import { useAuth } from "@/lib/auth";
+import { isPremium } from "@/lib/premium";
 import { tutorReply } from "@/lib/claude";
 import { awardXp, fetchRecentAttempts } from "@/lib/firestore";
 import { weakestTopics, type TopicMastery } from "@/lib/mastery";
@@ -95,7 +96,7 @@ function Bubble({ msg }: { msg: ChatMessage }) {
 
 export default function Tutor() {
   const { user, profile, configured } = useAuth();
-  const premium = profile?.premium ?? false;
+  const premium = isPremium(profile);
   const uid = profile?.uid ?? "demo";
 
   const availableSubjects: SubjectId[] =

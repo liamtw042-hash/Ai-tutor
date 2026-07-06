@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 import { useAuth } from "@/lib/auth";
+import { isPremium } from "@/lib/premium";
 import { generatePlan } from "@/lib/claude";
 import {
   fetchRecentAttempts,
@@ -44,7 +45,7 @@ const ACTIVITY_META: Record<
 
 export default function Planner() {
   const { user, profile, configured, togglePremium } = useAuth();
-  const premium = profile?.premium ?? false;
+  const premium = isPremium(profile);
 
   const [plan, setPlan] = useState<StudyPlan | null>(null);
   const [loading, setLoading] = useState(true);
@@ -100,6 +101,7 @@ export default function Planner() {
         hours,
         weak,
         sydneyDayKey(),
+        { email: profile?.email, premium },
       );
       const newPlan: StudyPlan = {
         exams,

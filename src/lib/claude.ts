@@ -108,6 +108,9 @@ export function generateFlashcards(
 
 export function analyzeWork(payload: {
   action: UploadAction;
+  /** caller identity for the server-side premium/owner check */
+  email?: string;
+  premium?: boolean;
   subjectName?: string;
   stage?: string;
   question?: string;
@@ -123,6 +126,14 @@ export function generatePlan(
   hoursPerWeek: number,
   weakTopics: { subjectName: string; topic: string; accuracy: number }[],
   todayKey: string,
+  auth?: { email?: string; premium?: boolean },
 ): Promise<{ summary: string; weeks: PlanWeek[] }> {
-  return postJSON("/api/plan", { exams, hoursPerWeek, weakTopics, todayKey });
+  return postJSON("/api/plan", {
+    exams,
+    hoursPerWeek,
+    weakTopics,
+    todayKey,
+    email: auth?.email,
+    premium: auth?.premium,
+  });
 }

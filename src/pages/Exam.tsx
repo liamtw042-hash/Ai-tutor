@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { motion } from "framer-motion";
 import { useAuth } from "@/lib/auth";
+import { isPremium } from "@/lib/premium";
 import { questionsForSubject } from "@/data/questions";
 import { SUBJECTS, getSubject } from "@/data/subjects";
 import { DISCLAIMERS } from "@/data/nesa";
@@ -40,7 +41,7 @@ type Phase = "setup" | "running" | "marking" | "results";
 
 export default function Exam() {
   const { user, profile, configured, togglePremium } = useAuth();
-  const premium = profile?.premium ?? false;
+  const premium = isPremium(profile);
 
   const [phase, setPhase] = useState<Phase>("setup");
   const [subjectId, setSubjectId] = useState<SubjectId | null>(null);
