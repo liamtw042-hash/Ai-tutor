@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from "react";
 import { Badge, Button, Card, EmptyState, Progress, cn } from "@/components/ui";
 import { DocIcon, SparkIcon, TargetIcon } from "@/components/icons";
 import { SUBJECTS, getSubject } from "@/data/subjects";
+import { DISCLAIMERS } from "@/data/nesa";
 import { useAuth } from "@/lib/auth";
 import { reviewEssay } from "@/lib/claude";
 import {
@@ -10,7 +11,12 @@ import {
   saveEssayRecord,
 } from "@/lib/firestore";
 import { canUse, incrementUsage, remaining } from "@/lib/usage";
-import type { EssayFeedback, EssayRecord, SubjectId } from "@/types";
+import {
+  stageLabel,
+  type EssayFeedback,
+  type EssayRecord,
+  type SubjectId,
+} from "@/types";
 
 const QUESTION_TYPES = [
   "Essay / extended response",
@@ -76,6 +82,7 @@ export default function Essay() {
         subject.bands,
         essay,
         question.trim() || undefined,
+        stageLabel(profile?.yearLevel),
       );
       setFb(result);
       if (!premium) incrementUsage(uid, "essay");
@@ -212,6 +219,10 @@ export default function Essay() {
               </div>
 
               <p className="text-sm leading-relaxed text-ink-200">{fb.overall}</p>
+
+              <p className="rounded-lg border border-white/5 bg-white/[0.02] px-3 py-2 text-[11px] leading-relaxed text-ink-500">
+                {DISCLAIMERS.marking}
+              </p>
 
               {/* Criteria */}
               <div className="space-y-3">

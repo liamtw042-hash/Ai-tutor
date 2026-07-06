@@ -15,6 +15,7 @@ interface Body {
   subjectName: string;
   topic: string;
   count: number; // 5..20
+  stage?: string;
 }
 
 interface GeneratedCard {
@@ -28,15 +29,16 @@ export default async function handler(
 ) {
   if (!methodGuard(req, res)) return;
   try {
-    const { subjectName, topic, count } = readBody<Body>(req);
+    const { subjectName, topic, count, stage } = readBody<Body>(req);
     if (!subjectName || !topic) {
       res.status(400).json({ error: "subjectName and topic are required" });
       return;
     }
     const n = Math.max(5, Math.min(20, Math.round(count || 12)));
+    const level = stage || "Year 12 (Stage 6 HSC)";
 
     const system = [
-      `You are an expert NSW HSC teacher for ${subjectName} making flashcards on "${topic}".`,
+      `You are an expert NSW teacher for ${subjectName} making flashcards on "${topic}" for a student in ${level}.`,
       `Create exactly ${n} high-quality flashcards optimised for ACTIVE RECALL:`,
       "- Front: a specific question, term, or cue — never a vague heading. Test one atomic fact or concept per card.",
       "- Back: a precise, complete answer in 1-3 sentences. Include formulas, definitions with key qualifiers, dates, or NESA terminology where relevant.",

@@ -17,6 +17,8 @@ interface Body {
   count: number; // 1..5
   type: "multiple-choice" | "short-answer" | "mixed";
   difficulty: "foundation" | "standard" | "challenge";
+  /** e.g. "Year 11 (Stage 6 Preliminary)" */
+  stage?: string;
 }
 
 interface GeneratedQuestion {
@@ -37,12 +39,14 @@ export default async function handler(
 ) {
   if (!methodGuard(req, res)) return;
   try {
-    const { subjectName, topic, count, type, difficulty } = readBody<Body>(req);
+    const { subjectName, topic, count, type, difficulty, stage } =
+      readBody<Body>(req);
     if (!subjectName || !topic) {
       res.status(400).json({ error: "subjectName and topic are required" });
       return;
     }
     const n = Math.max(1, Math.min(5, Math.round(count || 3)));
+    const level = stage || "Year 12 (Stage 6 HSC)";
 
     const typeRule =
       type === "multiple-choice"
@@ -52,12 +56,13 @@ export default async function handler(
           : "Mix multiple-choice (4 options) and short-answer (3-5 marks with markingCriteria).";
 
     const system = [
-      `You are an experienced NSW HSC exam writer for ${subjectName}.`,
-      `Write ${n} original, exam-authentic HSC-style questions on the topic "${topic}" at ${difficulty} difficulty.`,
-      "Match the style, command verbs (identify, explain, analyse, evaluate...) and mark weightings of real NESA HSC papers.",
+      `You are an experienced NSW exam writer for ${subjectName}, writing for a student in ${level}.`,
+      `Write ${n} original, exam-authentic questions on the topic "${topic}" at ${difficulty} difficulty, pitched at the ${level} standard (content, depth and command verbs appropriate to that stage — not harder or easier).`,
+      "Match the style, command verbs (identify, explain, analyse, evaluate...) and mark weightings NESA uses at this stage.",
       typeRule,
       "Rules:",
       "- Questions must be original (never copied from real past papers).",
+      "- Keep every question inside this subject and stage's syllabus scope. If you are unsure whether a sub-topic is in scope for this year, choose a clearly in-scope one instead.",
       "- Multiple-choice: exactly 4 plausible options, one correct, correctIndex 0-3, solution explains why the answer is right AND why each distractor is wrong.",
       "- Short-answer: 3-5 marks, markingCriteria as an array of NESA-style criteria lines with mark allocations, solution is a full-mark model answer.",
       "- Australian English, NESA terminology.",

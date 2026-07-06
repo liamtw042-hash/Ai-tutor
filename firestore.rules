@@ -42,6 +42,9 @@ service cloud.firestore {
       match /plans/{id} {
         allow read, write: if isOwner(uid);
       }
+      match /uploads/{id} {
+        allow read, write: if isOwner(uid);
+      }
     }
 
     // Opt-in leaderboard: any signed-in user can read; each user may only

@@ -1,9 +1,10 @@
-# StudyMate HSC
+# StudyMate
 
-**AI tutoring for the NSW HSC, built on the study loop that actually works:**
+**AI tutoring for NSW students in Years 10, 11 and 12** (Stage 5,
+Preliminary and HSC), built on the study loop that actually works:
 active recall + SM-2 spaced repetition + a daily habit — plus a Socratic AI
-tutor, AI-generated practice, essay marking against NESA bands, timed
-past-paper mode and personalised study plans.
+tutor, AI-generated practice, essay marking against NESA bands, photo &
+document help with Claude vision, timed past-paper mode and study plans.
 
 Built with **React + Vite + TypeScript + Tailwind + Framer Motion**,
 **Firebase** (auth + Firestore), and the **Claude API** (via Vercel serverless
@@ -38,6 +39,10 @@ functions).
   answers, and *knows your weak topics* from real attempt data. Talk to it
   hands-free with **voice input & spoken replies** (Web Speech API, with a
   graceful text-only fallback where unsupported).
+- **Photo & document help (Premium)** — snap a photo of handwritten work or
+  upload a worksheet/PDF; Claude's vision reads it (handwriting included) and
+  will explain it, mark it against the standard for the student's year, or turn
+  it into fresh practice. Files are stored owner-only in Firebase Storage.
 - **Essay feedback** — marked holistically against NESA band descriptors, with
   a band estimate per criterion (thesis, evidence, analysis, expression) and
   band history over time.
@@ -52,13 +57,20 @@ functions).
 ### Freemium
 Free: 15 questions/day, unlimited reviews, 10 tutor messages/day, 1 essay/day,
 1 AI generation + 1 AI deck/day, all gamification.
-Premium ($9.99/mo, demo toggle): unlimited everything + exam mode + study plans
-+ detailed analytics.
+Premium ($20/mo AUD, demo toggle): unlimited everything + exam mode + study plans
++ photo & document upload + detailed analytics.
 
 ### Subjects
 Mathematics Advanced · Mathematics Extension 1 · English Advanced ·
 English Standard · Biology · Chemistry · Physics · Modern History ·
 Economics · Business Studies
+
+**Year levels:** Year 10 (Stage 5), Year 11 (Preliminary) and Year 12 (HSC).
+Students pick their year at onboarding; topics, AI tutoring, generation and
+marking adapt to that stage. See `src/data/subjects.ts` for the per-year topic
+map and its verification notes. StudyMate is a study aid, not a substitute for
+official NESA materials — the app links students to the official syllabuses and
+free past papers.
 
 ---
 

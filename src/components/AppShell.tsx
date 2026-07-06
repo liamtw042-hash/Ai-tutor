@@ -19,6 +19,7 @@ import {
   LogoutIcon,
   PenIcon,
   SparkIcon,
+  UploadIcon,
   XIcon,
 } from "@/components/icons";
 
@@ -43,6 +44,7 @@ const NAV_SECTIONS: { title: string; items: NavItem[] }[] = [
     title: "AI Coach",
     items: [
       { to: "/tutor", label: "AI Tutor", icon: ChatIcon },
+      { to: "/upload", label: "Photo & Docs", icon: UploadIcon, premium: true },
       { to: "/essay", label: "Essay Feedback", icon: DocIcon },
     ],
   },
@@ -166,7 +168,7 @@ function UpgradeCard() {
         className="mt-3 w-full text-xs"
         onClick={togglePremium}
       >
-        Upgrade — $9.99/mo
+        Upgrade — $20/mo
       </Button>
       <p className="mt-1.5 text-center text-[10px] text-ink-500">
         Demo: toggles instantly, no card required

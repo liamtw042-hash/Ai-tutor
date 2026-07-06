@@ -11,6 +11,7 @@ import Review from "@/pages/Review";
 import Practice from "@/pages/Practice";
 import Flashcards from "@/pages/Flashcards";
 import Tutor from "@/pages/Tutor";
+import UploadPage from "@/pages/Upload";
 import Essay from "@/pages/Essay";
 import Exam from "@/pages/Exam";
 import Planner from "@/pages/Planner";
@@ -42,6 +43,7 @@ const APP_ROUTES: { path: string; element: React.ReactNode }[] = [
   { path: "/practice", element: <Practice /> },
   { path: "/flashcards", element: <Flashcards /> },
   { path: "/tutor", element: <Tutor /> },
+  { path: "/upload", element: <UploadPage /> },
   { path: "/essay", element: <Essay /> },
   { path: "/exam", element: <Exam /> },
   { path: "/planner", element: <Planner /> },

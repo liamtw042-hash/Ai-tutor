@@ -239,6 +239,36 @@ export const MicIcon = (p: IconProps) => (
   </svg>
 );
 
+export const UploadIcon = (p: IconProps) => (
+  <svg {...base(p)}>
+    <path d="M12 16V4" />
+    <path d="m7 9 5-5 5 5" />
+    <path d="M5 20h14" />
+  </svg>
+);
+
+export const CameraIcon = (p: IconProps) => (
+  <svg {...base(p)}>
+    <path d="M4 8a2 2 0 0 1 2-2h1.5l1-1.5h5L15 6h3a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2Z" />
+    <circle cx="12" cy="12.5" r="3.2" />
+  </svg>
+);
+
+export const ImageIcon = (p: IconProps) => (
+  <svg {...base(p)}>
+    <rect x="3" y="4" width="18" height="16" rx="2" />
+    <circle cx="8.5" cy="9.5" r="1.6" />
+    <path d="m4 18 5-5 4 4 3-3 4 4" />
+  </svg>
+);
+
+export const FileIcon = (p: IconProps) => (
+  <svg {...base(p)}>
+    <path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8Z" />
+    <path d="M14 3v5h5" />
+  </svg>
+);
+
 export const SpeakerOnIcon = (p: IconProps) => (
   <svg {...base(p)}>
     <path d="M4 9v6h4l5 4V5L8 9H4Z" />

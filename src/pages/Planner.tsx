@@ -148,7 +148,7 @@ export default function Planner() {
             your weak topics, switching to past papers as each exam closes in.
           </p>
           <Button className="mt-6" onClick={togglePremium}>
-            <SparkIcon className="h-4 w-4" /> Upgrade — $9.99/mo
+            <SparkIcon className="h-4 w-4" /> Upgrade — $20/mo
           </Button>
           <p className="mt-2 text-[11px] text-ink-500">
             Demo: toggles instantly, no card required

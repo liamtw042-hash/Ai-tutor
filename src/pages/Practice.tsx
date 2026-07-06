@@ -9,8 +9,9 @@ import {
   WandIcon,
   XIcon,
 } from "@/components/icons";
-import { SUBJECTS, getSubject } from "@/data/subjects";
+import { SUBJECTS, getSubject, topicsForYear } from "@/data/subjects";
 import { questionsForSubject } from "@/data/questions";
+import { DISCLAIMERS } from "@/data/nesa";
 import { useAuth } from "@/lib/auth";
 import {
   awardXp,
@@ -19,11 +20,13 @@ import {
 } from "@/lib/firestore";
 import { generateQuestions, markWritten } from "@/lib/claude";
 import { canUse, incrementUsage, remaining } from "@/lib/usage";
-import type {
-  GeneratedQuestion,
-  Question,
-  SubjectId,
-  WrittenFeedback,
+import {
+  stageLabel,
+  type GeneratedQuestion,
+  type Question,
+  type SubjectId,
+  type WrittenFeedback,
+  type YearLevel,
 } from "@/types";
 
 const TYPE_LABEL: Record<string, string> = {
@@ -55,9 +58,11 @@ function LimitBanner() {
 function WrittenPanel({
   question,
   onGraded,
+  stage,
 }: {
   question: Question;
   onGraded: (fb: WrittenFeedback) => void;
+  stage: string;
 }) {
   const [answer, setAnswer] = useState("");
   const [loading, setLoading] = useState(false);
@@ -78,6 +83,7 @@ function WrittenPanel({
         },
         subject.name,
         answer,
+        stage,
       );
       setFb(result);
       onGraded(result);
@@ -189,6 +195,7 @@ function GenerateModal({
   topics,
   uid,
   premium,
+  stage,
   onGenerated,
 }: {
   open: boolean;
@@ -197,6 +204,7 @@ function GenerateModal({
   topics: string[];
   uid: string;
   premium: boolean;
+  stage: string;
   onGenerated: (qs: Question[]) => void;
 }) {
   const subject = getSubject(subjectId);
@@ -223,10 +231,11 @@ function GenerateModal({
     try {
       const res = await generateQuestions(
         subject.name,
-        topic || subject.topics[0],
+        topic || topics[0] || subject.topics[0],
         3,
         type,
         difficulty,
+        stage,
       );
       if (!premium) incrementUsage(uid, "generate");
       const now = Date.now();
@@ -263,8 +272,9 @@ function GenerateModal({
     <Modal open={open} onClose={onClose} title="Generate fresh questions">
       <div className="space-y-4">
         <p className="text-sm text-ink-300">
-          AI writes 3 original, HSC-style questions on any {subject.short} topic
-          — exam command verbs, plausible distractors, full solutions.
+          AI writes 3 original, exam-style questions pitched at your year on any{" "}
+          {subject.short} topic — command verbs, plausible distractors, full
+          solutions.
         </p>
         <div>
           <label className="label">Topic</label>
@@ -273,7 +283,7 @@ function GenerateModal({
             value={topic}
             onChange={(e) => setTopic(e.target.value)}
           >
-            {subject.topics.map((t) => (
+            {topics.map((t) => (
               <option key={t} value={t}>
                 {t}
               </option>
@@ -322,6 +332,9 @@ function GenerateModal({
           <WandIcon className="h-4 w-4" />
           {busy ? "Writing questions…" : "Generate 3 questions"}
         </Button>
+        <p className="text-center text-[11px] leading-relaxed text-ink-500">
+          {DISCLAIMERS.generated}
+        </p>
       </div>
     </Modal>
   );
@@ -332,6 +345,8 @@ export default function Practice() {
   const [params, setParams] = useSearchParams();
   const premium = profile?.premium ?? false;
   const uid = profile?.uid ?? "demo";
+  const year: YearLevel = profile?.yearLevel ?? "year12";
+  const stage = stageLabel(profile?.yearLevel);
 
   const availableSubjects: SubjectId[] =
     profile?.subjects?.length ? profile.subjects : SUBJECTS.map((s) => s.id);
@@ -599,6 +614,7 @@ export default function Practice() {
                 key={question.id}
                 question={question}
                 onGraded={onWrittenGraded}
+                stage={stage}
               />
             )}
           </div>
@@ -660,9 +676,10 @@ export default function Practice() {
         open={genOpen}
         onClose={() => setGenOpen(false)}
         subjectId={subjectId}
-        topics={getSubject(subjectId).topics}
+        topics={topicsForYear(subjectId, year)}
         uid={uid}
         premium={premium}
+        stage={stage}
         onGenerated={(qs) => {
           setGenerated((prev) => [...qs, ...prev]);
           setTopic("All topics");

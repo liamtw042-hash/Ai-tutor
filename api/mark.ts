@@ -12,6 +12,7 @@ import {
 interface Body {
   subjectName: string;
   answer: string;
+  stage?: string;
   question: {
     prompt: string;
     marks: number;
@@ -37,20 +38,21 @@ export default async function handler(
 ) {
   if (!methodGuard(req, res)) return;
   try {
-    const { subjectName, answer, question } = readBody<Body>(req);
+    const { subjectName, answer, question, stage } = readBody<Body>(req);
     if (!answer?.trim()) {
       res.status(400).json({ error: "answer is required" });
       return;
     }
+    const level = stage || "Year 12 (Stage 6 HSC)";
 
     const criteria = question.markingCriteria?.length
       ? question.markingCriteria.map((c) => `- ${c}`).join("\n")
       : "- Award marks according to NESA standards for this response type.";
 
     const system = [
-      `You are an experienced NSW HSC marker for ${subjectName}.`,
-      "Mark the student's response strictly against the NESA marking criteria provided.",
-      "Be fair but rigorous — award marks only for what is actually demonstrated.",
+      `You are an experienced NSW marker for ${subjectName}, marking a response from a student in ${level}.`,
+      "Mark the student's response against the marking criteria provided, applying the standard expected at this stage.",
+      "Be fair but rigorous — award marks only for what is actually demonstrated. This is a study estimate to guide improvement, not an official NESA mark; don't overstate its authority in the summary.",
       "Return ONLY a JSON object, no prose, matching exactly this shape:",
       `{`,
       `  "awardedMarks": number,      // 0..${question.marks}`,

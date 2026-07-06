@@ -14,7 +14,7 @@ import {
 } from "@/lib/firestore";
 import { generateFlashcards } from "@/lib/claude";
 import { canUse, incrementUsage, remaining } from "@/lib/usage";
-import { SUBJECTS, getSubject } from "@/data/subjects";
+import { SUBJECTS, getSubject, topicsForYear } from "@/data/subjects";
 import {
   Badge,
   Button,
@@ -33,7 +33,14 @@ import {
   WandIcon,
   XIcon,
 } from "@/components/icons";
-import type { Deck, Flashcard, ReviewGrade, SubjectId } from "@/types";
+import {
+  stageLabel,
+  type Deck,
+  type Flashcard,
+  type ReviewGrade,
+  type SubjectId,
+  type YearLevel,
+} from "@/types";
 
 type StudyMode = "flip" | "write" | "match";
 
@@ -222,6 +229,8 @@ export default function Flashcards() {
         uid={uid}
         premium={premium}
         subjects={profile?.subjects?.length ? profile.subjects : SUBJECTS.map((s) => s.id)}
+        year={profile?.yearLevel ?? "year12"}
+        stage={stageLabel(profile?.yearLevel)}
         onCreated={onDeckCreated}
       />
     </div>
@@ -237,6 +246,8 @@ function CreateDeckModal({
   uid,
   premium,
   subjects,
+  year,
+  stage,
   onCreated,
 }: {
   open: boolean;
@@ -244,6 +255,8 @@ function CreateDeckModal({
   uid: string;
   premium: boolean;
   subjects: SubjectId[];
+  year: YearLevel;
+  stage: string;
   onCreated: (deckId: string) => Promise<void>;
 }) {
   const [tab, setTab] = useState<"ai" | "manual">("ai");
@@ -272,7 +285,12 @@ function CreateDeckModal({
           setBusy(false);
           return;
         }
-        const res = await generateFlashcards(subject.name, topic.trim(), count);
+        const res = await generateFlashcards(
+          subject.name,
+          topic.trim(),
+          count,
+          stage,
+        );
         cards = res.cards;
         if (!premium) incrementUsage(uid, "aiDeck");
       }
@@ -338,7 +356,7 @@ function CreateDeckModal({
             onChange={(e) => setTopic(e.target.value)}
           />
           <datalist id="topic-suggestions">
-            {subject.topics.map((t) => (
+            {topicsForYear(subjectId, year).map((t) => (
               <option key={t} value={t} />
             ))}
           </datalist>

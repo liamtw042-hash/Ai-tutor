@@ -3,6 +3,7 @@ import { motion } from "framer-motion";
 import { Logo } from "@/components/Logo";
 import { Badge } from "@/components/ui";
 import { SUBJECTS } from "@/data/subjects";
+import { DISCLAIMERS, NESA_LINKS } from "@/data/nesa";
 import {
   ArrowRightIcon,
   BoltIcon,
@@ -120,8 +121,8 @@ export default function Landing() {
               animate={{ opacity: 1 }}
             >
               <Badge tone="brand">
-                <SparkIcon className="h-3.5 w-3.5" /> Built for the NSW HSC —
-                aligned to NESA syllabuses
+                <SparkIcon className="h-3.5 w-3.5" /> For NSW students, Years 10–12
+                — aligned to NESA syllabuses
               </Badge>
             </motion.div>
             <motion.h1
@@ -161,7 +162,7 @@ export default function Landing() {
               </a>
             </motion.div>
             <p className="mt-4 text-sm text-ink-500">
-              Free forever plan · No credit card · 10 subjects
+              Free forever plan · No credit card · Years 10–12 · 10 subjects
             </p>
           </div>
 
@@ -266,8 +267,8 @@ export default function Landing() {
             Start free. Upgrade when you're serious.
           </h2>
           <p className="mx-auto mt-3 max-w-xl text-ink-300">
-            One month of Premium costs less than 15 minutes with a private
-            tutor.
+            A whole month of Premium costs less than half an hour with a private
+            tutor — and far less than Edrolo. Cancel anytime.
           </p>
         </div>
         <div className="grid items-start gap-5 md:grid-cols-2">
@@ -314,14 +315,15 @@ export default function Landing() {
             </p>
             <div className="mt-5 flex items-baseline gap-1">
               <span className="font-display text-4xl font-bold text-white">
-                $9.99
+                $20
               </span>
-              <span className="text-ink-400">/month</span>
+              <span className="text-ink-400">/month AUD</span>
             </div>
             <ul className="mt-6 space-y-3 text-sm">
               {[
                 "Unlimited practice, tutoring & essay marking",
                 "Unlimited AI question & flashcard generation",
+                "Snap a photo of your work — AI reads & marks it",
                 "Timed past-paper exam mode, AI-marked",
                 "Personalised study plan to your exam dates",
                 "Full progress analytics",
@@ -344,7 +346,7 @@ export default function Landing() {
       <section className="mx-auto max-w-6xl px-4 pb-20 sm:px-6">
         <div className="relative overflow-hidden rounded-3xl border border-brand-500/20 bg-gradient-to-br from-brand-600/20 via-ink-900 to-ink-900 p-10 text-center sm:p-14">
           <h2 className="font-display text-3xl font-bold text-white sm:text-4xl">
-            Your HSC won't study for itself.
+            Your exams won't study for themselves.
           </h2>
           <p className="mx-auto mt-3 max-w-xl text-ink-300">
             Twenty minutes a day, aimed at exactly the right topics. Start the
@@ -359,13 +361,50 @@ export default function Landing() {
         </div>
       </section>
 
+      {/* Official NESA resources */}
+      <section className="mx-auto max-w-6xl px-4 pb-12 sm:px-6">
+        <div className="rounded-2xl border border-white/5 bg-ink-900/40 p-6 sm:p-8">
+          <h2 className="font-display text-lg font-bold text-white">
+            Go straight to the source
+          </h2>
+          <p className="mt-1 max-w-2xl text-sm text-ink-400">
+            StudyMate is a study aid — the official NSW syllabuses, past papers
+            and marking guidelines are free and always the final word. Bookmark
+            these:
+          </p>
+          <div className="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+            {NESA_LINKS.map((l) => (
+              <a
+                key={l.url}
+                href={l.url}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="rounded-xl border border-white/5 bg-white/[0.02] p-4 transition hover:border-brand-500/30 hover:bg-brand-500/5"
+              >
+                <p className="text-sm font-semibold text-brand-200">
+                  {l.label}
+                </p>
+                <p className="mt-1 text-xs leading-relaxed text-ink-400">
+                  {l.description}
+                </p>
+              </a>
+            ))}
+          </div>
+        </div>
+      </section>
+
       {/* Footer */}
       <footer className="border-t border-white/5">
-        <div className="mx-auto flex max-w-6xl flex-col items-center justify-between gap-4 px-4 py-8 sm:flex-row sm:px-6">
-          <Logo size={26} />
-          <p className="text-sm text-ink-500">
-            © {new Date().getFullYear()} StudyMate HSC · Made for NSW students.
-            Not affiliated with NESA.
+        <div className="mx-auto flex max-w-6xl flex-col gap-3 px-4 py-8 sm:px-6">
+          <div className="flex flex-col items-center justify-between gap-3 sm:flex-row">
+            <Logo size={26} />
+            <p className="text-sm text-ink-500">
+              © {new Date().getFullYear()} StudyMate · Made for NSW students,
+              Years 10–12. Not affiliated with NESA.
+            </p>
+          </div>
+          <p className="max-w-3xl text-xs leading-relaxed text-ink-600">
+            {DISCLAIMERS.general}
           </p>
         </div>
       </footer>

@@ -22,7 +22,7 @@ import { awardXp, fetchRecentAttempts } from "@/lib/firestore";
 import { weakestTopics, type TopicMastery } from "@/lib/mastery";
 import { useSpeechRecognition, useSpeechSynthesis } from "@/lib/speech";
 import { canUse, incrementUsage, remaining } from "@/lib/usage";
-import type { ChatMessage, SubjectId } from "@/types";
+import { stageLabel, type ChatMessage, type SubjectId } from "@/types";
 
 const SUGGESTIONS: Partial<Record<SubjectId, string[]>> = {
   "math-adv": [
@@ -166,6 +166,7 @@ export default function Tutor() {
         nextMessages,
         subjectWeak,
         profile?.displayName?.split(" ")[0],
+        stageLabel(profile?.yearLevel),
       );
       // Only count a successful exchange against the daily free allowance — a
       // failed request (e.g. network drop) shouldn't burn a message.

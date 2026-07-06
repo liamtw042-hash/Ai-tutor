@@ -19,12 +19,15 @@ interface Body {
   /** topics this student is currently weak in (from their real attempt data) */
   weakTopics?: { topic: string; accuracy: number }[];
   studentName?: string;
+  /** e.g. "Year 12 (Stage 6 HSC)" */
+  stage?: string;
 }
 
 function systemPrompt(
   subject: string,
   weakTopics: { topic: string; accuracy: number }[],
   studentName?: string,
+  stage?: string,
 ): string {
   const weakSection =
     weakTopics.length > 0
@@ -38,9 +41,10 @@ function systemPrompt(
         ].join("\n")
       : "";
 
+  const level = stage || "Year 12 (Stage 6 HSC)";
   return [
-    `You are StudyMate, an expert HSC tutor for the NSW subject "${subject}".`,
-    `You are talking to ${studentName || "a NSW high school student"} (Year 11–12) preparing for the HSC.`,
+    `You are StudyMate, an expert NSW tutor for the subject "${subject}".`,
+    `You are talking to ${studentName || "a NSW high school student"} who is in ${level}. Pitch every explanation at that stage — don't assume knowledge above their year, and use the terminology their syllabus uses.`,
     "",
     "TEACHING METHOD — strict Socratic tutoring:",
     "- NEVER hand over the final answer to a substantive problem, even when asked directly. Working it out is the point.",
@@ -53,9 +57,10 @@ function systemPrompt(
     "",
     "STYLE:",
     "- Warm, encouraging, concise. Australian English and NSW/NESA terminology.",
-    "- Reference syllabus outcomes, command verbs and band expectations where useful.",
+    "- Refer to command verbs (identify, explain, analyse, evaluate…) and band expectations where useful.",
+    "- Do NOT invent specific NESA syllabus outcome codes, mark allocations or quote official marking criteria unless you are certain of them for this subject and stage. If unsure, describe the skill or expectation in plain terms instead of citing a code — accuracy matters more than sounding official.",
     "- Plain text with simple formatting. Keep replies under ~160 words.",
-    "- Stay on the subject and on HSC study.",
+    "- Stay on the subject and on NSW study for their year.",
     weakSection,
   ].join("\n");
 }
@@ -66,7 +71,8 @@ export default async function handler(
 ) {
   if (!methodGuard(req, res)) return;
   try {
-    const { subjectName, messages, weakTopics, studentName } = readBody<Body>(req);
+    const { subjectName, messages, weakTopics, studentName, stage } =
+      readBody<Body>(req);
     if (!Array.isArray(messages) || messages.length === 0) {
       res.status(400).json({ error: "messages are required" });
       return;
@@ -77,9 +83,10 @@ export default async function handler(
       max_tokens: 700,
       temperature: 0.7,
       system: systemPrompt(
-        subjectName || "the HSC",
+        subjectName || "NSW studies",
         Array.isArray(weakTopics) ? weakTopics.slice(0, 4) : [],
         studentName,
+        stage,
       ),
       messages: messages.slice(-16).map((m) => ({
         role: m.role,

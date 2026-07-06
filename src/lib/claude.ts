@@ -5,6 +5,7 @@ import type {
   GeneratedQuestion,
   PlanWeek,
   Question,
+  UploadAction,
   WrittenFeedback,
 } from "@/types";
 
@@ -40,16 +41,24 @@ export function tutorReply(
   messages: ChatMessage[],
   weakTopics: { topic: string; accuracy: number }[] = [],
   studentName?: string,
+  stage?: string,
 ): Promise<{ reply: string }> {
-  return postJSON("/api/tutor", { subjectName, messages, weakTopics, studentName });
+  return postJSON("/api/tutor", {
+    subjectName,
+    messages,
+    weakTopics,
+    studentName,
+    stage,
+  });
 }
 
 export function markWritten(
   question: Pick<Question, "prompt" | "marks" | "markingCriteria" | "topic">,
   subjectName: string,
   answer: string,
+  stage?: string,
 ): Promise<WrittenFeedback> {
-  return postJSON("/api/mark", { question, subjectName, answer });
+  return postJSON("/api/mark", { question, subjectName, answer, stage });
 }
 
 export function reviewEssay(
@@ -58,6 +67,7 @@ export function reviewEssay(
   maxBand: number,
   essay: string,
   question?: string,
+  stage?: string,
 ): Promise<EssayFeedback> {
   return postJSON("/api/essay", {
     subjectName,
@@ -65,6 +75,7 @@ export function reviewEssay(
     maxBand,
     essay,
     question,
+    stage,
   });
 }
 
@@ -74,16 +85,37 @@ export function generateQuestions(
   count: number,
   type: "multiple-choice" | "short-answer" | "mixed",
   difficulty: "foundation" | "standard" | "challenge",
+  stage?: string,
 ): Promise<{ questions: GeneratedQuestion[] }> {
-  return postJSON("/api/generate", { subjectName, topic, count, type, difficulty });
+  return postJSON("/api/generate", {
+    subjectName,
+    topic,
+    count,
+    type,
+    difficulty,
+    stage,
+  });
 }
 
 export function generateFlashcards(
   subjectName: string,
   topic: string,
   count: number,
+  stage?: string,
 ): Promise<{ cards: GeneratedCard[] }> {
-  return postJSON("/api/flashcards", { subjectName, topic, count });
+  return postJSON("/api/flashcards", { subjectName, topic, count, stage });
+}
+
+export function analyzeWork(payload: {
+  action: UploadAction;
+  subjectName?: string;
+  stage?: string;
+  question?: string;
+  image?: { data: string; mediaType: string };
+  pdf?: { data: string };
+  text?: string;
+}): Promise<{ result: string }> {
+  return postJSON("/api/analyze", payload);
 }
 
 export function generatePlan(

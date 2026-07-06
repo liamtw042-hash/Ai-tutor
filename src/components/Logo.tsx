@@ -54,7 +54,7 @@ export function Logo({
         <span className="font-display text-lg font-bold tracking-tight text-white">
           StudyMate
           <span className="ml-1 rounded-md bg-brand-500/15 px-1.5 py-0.5 align-middle text-[11px] font-bold text-brand-200 ring-1 ring-inset ring-brand-500/30">
-            HSC
+            NSW
           </span>
         </span>
       )}

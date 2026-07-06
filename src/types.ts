@@ -1,6 +1,54 @@
 // ---------------------------------------------------------------------------
-// Shared domain types for StudyMate HSC
+// Shared domain types for StudyMate (NSW Years 10–12)
 // ---------------------------------------------------------------------------
+
+/**
+ * NSW stage/year the student is working at.
+ * - year10 → Stage 5 (RoSA)
+ * - year11 → Stage 6, Preliminary
+ * - year12 → Stage 6, HSC
+ */
+export type YearLevel = "year10" | "year11" | "year12";
+
+export const YEAR_LEVELS: {
+  id: YearLevel;
+  label: string;
+  short: string;
+  stage: string;
+  blurb: string;
+}[] = [
+  {
+    id: "year10",
+    label: "Year 10",
+    short: "Yr 10",
+    stage: "Stage 5",
+    blurb: "Stage 5 — building toward your Record of School Achievement (RoSA).",
+  },
+  {
+    id: "year11",
+    label: "Year 11",
+    short: "Yr 11",
+    stage: "Stage 6 Preliminary",
+    blurb: "Preliminary (Stage 6) — the foundation for your HSC courses.",
+  },
+  {
+    id: "year12",
+    label: "Year 12",
+    short: "Yr 12",
+    stage: "Stage 6 HSC",
+    blurb: "HSC year (Stage 6) — the exams that count.",
+  },
+];
+
+export function yearLevelMeta(id: YearLevel) {
+  return YEAR_LEVELS.find((y) => y.id === id) ?? YEAR_LEVELS[2];
+}
+
+/** Human stage string passed to the AI, e.g. "Year 11 (Stage 6 Preliminary)". */
+export function stageLabel(id: YearLevel | undefined | null): string {
+  const m = yearLevelMeta(id ?? "year12");
+  return `${m.label} (${m.stage})`;
+}
 
 export type SubjectId =
   | "math-adv"
@@ -24,7 +72,18 @@ export interface Subject {
   gradient: [string, string];
   icon: string; // emoji/glyph used in cards
   blurb: string;
+  /**
+   * Union of topics across all years (kept for back-compat / broad listings).
+   * Prefer `topicsByYear` + `topicsForYear()` when a year context is known.
+   */
   topics: string[];
+  /** Syllabus topics/modules split by year level. */
+  topicsByYear: Record<YearLevel, string[]>;
+  /**
+   * Which years this subject is offered. Stage 6 courses (e.g. Extension) may
+   * not exist at Year 10.
+   */
+  years: YearLevel[];
   /** how many marking bands this subject reports (most HSC = 5, some 6) */
   bands: number;
 }
@@ -50,6 +109,8 @@ export interface Question {
   markingCriteria?: string[];
   /** NESA syllabus outcome codes this question targets */
   outcomes?: string[];
+  /** Year level this question targets. Undefined is treated as year12 (HSC). */
+  yearLevel?: YearLevel;
   difficulty: "foundation" | "standard" | "challenge";
   /** true when this question was AI-generated on demand (not in the seed bank) */
   generated?: boolean;
@@ -61,6 +122,8 @@ export interface UserProfile {
   uid: string;
   email: string;
   displayName: string;
+  /** NSW year level (Stage 5 / Preliminary / HSC). Defaults to year12. */
+  yearLevel: YearLevel;
   subjects: SubjectId[];
   premium: boolean;
   createdAt: number;
@@ -254,6 +317,27 @@ export interface LeaderboardEntry {
   streak: number;
   updatedAt: number;
 }
+
+// ---------- Uploads (photos & documents) ----------
+
+export interface Upload {
+  id: string;
+  /** original file name */
+  name: string;
+  kind: "image" | "pdf";
+  /** MIME type, e.g. image/jpeg or application/pdf */
+  mediaType: string;
+  /** bytes */
+  size: number;
+  /** path in Firebase Storage (owner-scoped) */
+  storagePath: string;
+  /** download URL */
+  url: string;
+  subjectId?: SubjectId;
+  createdAt: number;
+}
+
+export type UploadAction = "explain" | "mark" | "generate" | "ask";
 
 // ---------- AI response shapes (from /api) ----------
 

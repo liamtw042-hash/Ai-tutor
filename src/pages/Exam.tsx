@@ -3,6 +3,7 @@ import { motion } from "framer-motion";
 import { useAuth } from "@/lib/auth";
 import { questionsForSubject } from "@/data/questions";
 import { SUBJECTS, getSubject } from "@/data/subjects";
+import { DISCLAIMERS } from "@/data/nesa";
 import { markWritten } from "@/lib/claude";
 import {
   awardBadges,
@@ -27,11 +28,12 @@ import {
   SparkIcon,
   XIcon,
 } from "@/components/icons";
-import type {
-  ExamQuestionResult,
-  ExamResult,
-  Question,
-  SubjectId,
+import {
+  stageLabel,
+  type ExamQuestionResult,
+  type ExamResult,
+  type Question,
+  type SubjectId,
 } from "@/types";
 
 type Phase = "setup" | "running" | "marking" | "results";
@@ -151,6 +153,7 @@ export default function Exam() {
               },
               subject.name,
               given,
+              stageLabel(profile?.yearLevel),
             );
             results.push({
               questionId: q.id,
@@ -240,7 +243,7 @@ export default function Exam() {
             the HSC are won here.
           </p>
           <Button className="mt-6" onClick={togglePremium}>
-            <SparkIcon className="h-4 w-4" /> Upgrade — $9.99/mo
+            <SparkIcon className="h-4 w-4" /> Upgrade — $20/mo
           </Button>
           <p className="mt-2 text-[11px] text-ink-500">
             Demo: toggles instantly, no card required
@@ -292,6 +295,9 @@ export default function Exam() {
               {result.durationSeconds % 60}s of{" "}
               {Math.floor(result.timeLimitSeconds / 60)}m ·{" "}
               <span className="font-semibold text-brand-300">+60 XP</span>
+            </p>
+            <p className="mx-auto mt-4 max-w-md text-[11px] leading-relaxed text-ink-500">
+              {DISCLAIMERS.marking}
             </p>
           </Card>
         </motion.div>

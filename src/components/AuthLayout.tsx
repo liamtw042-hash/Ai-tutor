@@ -3,7 +3,7 @@ import { Logo } from "@/components/Logo";
 import { CheckIcon } from "@/components/icons";
 
 const POINTS = [
-  "Exam-style questions across all 10 HSC subjects",
+  "Exam-style questions for Years 10–12 across 10 NSW subjects",
   "An AI tutor that guides you to the answer",
   "Essay feedback marked against NESA bands",
 ];
@@ -45,7 +45,7 @@ export function AuthLayout({
           </ul>
         </div>
         <p className="relative text-sm text-ink-500">
-          Trusted study companion for the NSW HSC.
+          A study companion for NSW students — Years 10, 11 and 12.
         </p>
       </div>
 

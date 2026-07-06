@@ -22,6 +22,7 @@ export default defineConfig({
             "firebase/app",
             "firebase/auth",
             "firebase/firestore",
+            "firebase/storage",
           ],
         },
       },

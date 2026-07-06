@@ -16,6 +16,8 @@ interface Body {
   essay: string;
   /** the essay question / stimulus the student was answering, if provided */
   question?: string;
+  /** e.g. "Year 11 (Stage 6 Preliminary)" */
+  stage?: string;
 }
 
 interface EssayFeedback {
@@ -49,7 +51,7 @@ export default async function handler(
 ) {
   if (!methodGuard(req, res)) return;
   try {
-    const { subjectName, questionType, maxBand, essay, question } =
+    const { subjectName, questionType, maxBand, essay, question, stage } =
       readBody<Body>(req);
     if (!essay?.trim() || essay.trim().length < 40) {
       res.status(400).json({ error: "Please provide a longer response to mark." });
@@ -57,12 +59,14 @@ export default async function handler(
     }
 
     const band = maxBand && maxBand > 0 ? maxBand : 6;
+    const level = stage || "Year 12 (Stage 6 HSC)";
 
     const system = [
-      `You are a senior NSW HSC marker and ${subjectName} teacher marking a ${questionType}.`,
-      "Mark holistically against NESA band descriptors, the way real HSC marking centres do.",
+      `You are a senior NSW marker and ${subjectName} teacher marking a ${questionType} from a student in ${level}.`,
+      "Mark holistically against NESA band descriptors, the way real marking centres do, applying the standard expected at this stage.",
       BAND_DESCRIPTORS,
       "",
+      "This is a study estimate to guide improvement, not an official NESA mark — judge generously enough to be useful but honestly, and don't claim official authority.",
       "For EACH criterion, estimate which band that dimension of the response sits in — a response can be Band 5 on thesis but Band 3 on evidence.",
       "Be specific and constructive: quote or closely paraphrase the student's own words in comments. Never invent content they didn't write.",
       "If the response doesn't address the question given, say so plainly in `overall` — alignment to the question is the first thing markers check.",

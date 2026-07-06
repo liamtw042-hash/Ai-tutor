@@ -38,6 +38,7 @@ import type {
   SubjectId,
   TutorSession,
   UserProfile,
+  YearLevel,
 } from "@/types";
 
 // ------------------------------- Users -------------------------------------
@@ -47,6 +48,7 @@ function withProfileDefaults(p: Partial<UserProfile> & { uid: string }): UserPro
   return {
     email: "",
     displayName: "Student",
+    yearLevel: "year12",
     subjects: [],
     premium: false,
     createdAt: Date.now(),
@@ -97,6 +99,13 @@ export async function saveSubjects(
 
 export async function saveDailyGoal(uid: string, dailyGoal: number): Promise<void> {
   await updateDoc(doc(requireDb(), "users", uid), { dailyGoal });
+}
+
+export async function saveYearLevel(
+  uid: string,
+  yearLevel: YearLevel,
+): Promise<void> {
+  await updateDoc(doc(requireDb(), "users", uid), { yearLevel });
 }
 
 export async function setPremium(uid: string, premium: boolean): Promise<void> {
