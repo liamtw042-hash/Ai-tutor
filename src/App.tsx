@@ -16,6 +16,7 @@ import Essay from "@/pages/Essay";
 import Exam from "@/pages/Exam";
 import Planner from "@/pages/Planner";
 import ProgressPage from "@/pages/Progress";
+import Settings from "@/pages/Settings";
 
 function DemoBanner() {
   const { configured } = useAuth();
@@ -48,6 +49,7 @@ const APP_ROUTES: { path: string; element: React.ReactNode }[] = [
   { path: "/exam", element: <Exam /> },
   { path: "/planner", element: <Planner /> },
   { path: "/progress", element: <ProgressPage /> },
+  { path: "/settings", element: <Settings /> },
 ];
 
 export default function App() {

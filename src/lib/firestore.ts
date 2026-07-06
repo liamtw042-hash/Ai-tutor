@@ -108,6 +108,13 @@ export async function saveYearLevel(
   await updateDoc(doc(requireDb(), "users", uid), { yearLevel });
 }
 
+export async function saveDisplayName(
+  uid: string,
+  displayName: string,
+): Promise<void> {
+  await updateDoc(doc(requireDb(), "users", uid), { displayName });
+}
+
 export async function setPremium(uid: string, premium: boolean): Promise<void> {
   await updateDoc(doc(requireDb(), "users", uid), { premium });
 }

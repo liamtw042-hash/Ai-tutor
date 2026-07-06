@@ -1,5 +1,5 @@
 import { useState, type ReactNode } from "react";
-import { NavLink, useNavigate } from "react-router-dom";
+import { Link, NavLink, useNavigate } from "react-router-dom";
 import { Logo } from "@/components/Logo";
 import { useAuth } from "@/lib/auth";
 import { isPremium } from "@/lib/premium";
@@ -19,6 +19,7 @@ import {
   LockIcon,
   LogoutIcon,
   PenIcon,
+  SettingsIcon,
   SparkIcon,
   UploadIcon,
   XIcon,
@@ -56,6 +57,10 @@ const NAV_SECTIONS: { title: string; items: NavItem[] }[] = [
       { to: "/planner", label: "Study Plan", icon: CalendarIcon, premium: true },
       { to: "/progress", label: "Progress", icon: ChartIcon },
     ],
+  },
+  {
+    title: "Account",
+    items: [{ to: "/settings", label: "Settings", icon: SettingsIcon }],
   },
 ];
 
@@ -217,14 +222,14 @@ export function AppShell({ children }: { children: ReactNode }) {
             <div className="grid h-9 w-9 place-items-center rounded-lg bg-brand-600 text-sm font-bold text-white">
               {initials}
             </div>
-            <div className="min-w-0 flex-1">
-              <p className="truncate text-sm font-medium text-ink-100">
+            <Link to="/settings" className="min-w-0 flex-1" title="Settings">
+              <p className="truncate text-sm font-medium text-ink-100 hover:text-white">
                 {profile?.displayName || "Student"}
               </p>
               <p className="truncate text-xs text-ink-400">
                 {isPremium(profile) ? "Premium plan" : "Free plan"}
               </p>
-            </div>
+            </Link>
             <button
               onClick={handleSignOut}
               title="Sign out"

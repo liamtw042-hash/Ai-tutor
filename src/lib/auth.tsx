@@ -25,10 +25,24 @@ import {
   createProfile,
   fetchProfile,
   saveSubjects as persistSubjects,
+  saveDailyGoal as persistDailyGoal,
+  saveDisplayName as persistDisplayName,
+  saveYearLevel as persistYearLevel,
+  setLeaderboardOptIn as persistLeaderboardOptIn,
   setPremium as persistPremium,
   touchStreak,
 } from "@/lib/firestore";
-import type { SubjectId, UserProfile } from "@/types";
+import type { SubjectId, UserProfile, YearLevel } from "@/types";
+
+/** Fields a student can change from Settings after onboarding. */
+export interface ProfileSettingsPatch {
+  yearLevel?: YearLevel;
+  subjects?: SubjectId[];
+  dailyGoal?: number;
+  displayName?: string;
+  leaderboardOptIn?: boolean;
+  leaderboardAlias?: string;
+}
 
 interface AuthContextValue {
   user: User | null;
@@ -40,6 +54,7 @@ interface AuthContextValue {
   signInWithGoogle: () => Promise<void>;
   signOut: () => Promise<void>;
   saveSubjects: (subjects: SubjectId[]) => Promise<void>;
+  saveSettings: (patch: ProfileSettingsPatch) => Promise<void>;
   togglePremium: () => Promise<void>;
   refreshProfile: () => Promise<void>;
 }
@@ -118,6 +133,39 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     [user],
   );
 
+  const saveSettings = useCallback(
+    async (patch: ProfileSettingsPatch) => {
+      if (!user || !profile) return;
+      // Persist only the fields that changed, each with the right side effect.
+      // Progress, streak, XP and badges are never touched here.
+      if (patch.yearLevel !== undefined) {
+        await persistYearLevel(user.uid, patch.yearLevel);
+      }
+      if (patch.subjects !== undefined) {
+        await persistSubjects(user.uid, patch.subjects);
+      }
+      if (patch.dailyGoal !== undefined) {
+        await persistDailyGoal(user.uid, patch.dailyGoal);
+      }
+      if (patch.displayName !== undefined) {
+        await persistDisplayName(user.uid, patch.displayName);
+      }
+      if (
+        patch.leaderboardOptIn !== undefined ||
+        patch.leaderboardAlias !== undefined
+      ) {
+        const optIn = patch.leaderboardOptIn ?? profile.leaderboardOptIn;
+        const alias = patch.leaderboardAlias ?? profile.leaderboardAlias;
+        await persistLeaderboardOptIn(user.uid, optIn, alias);
+      }
+      // Merge into local state so the whole app re-filters immediately.
+      setProfile((prev) =>
+        prev ? { ...prev, ...patch, onboarded: true } : prev,
+      );
+    },
+    [user, profile],
+  );
+
   const togglePremium = useCallback(async () => {
     if (!user || !profile) return;
     const next = !profile.premium;
@@ -143,6 +191,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         signInWithGoogle,
         signOut,
         saveSubjects,
+        saveSettings,
         togglePremium,
         refreshProfile,
       }}
