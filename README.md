@@ -35,7 +35,9 @@ functions).
 
 ### The AI coach
 - **Socratic AI Tutor** — guides with questions, refuses to just hand over
-  answers, and *knows your weak topics* from real attempt data.
+  answers, and *knows your weak topics* from real attempt data. Talk to it
+  hands-free with **voice input & spoken replies** (Web Speech API, with a
+  graceful text-only fallback where unsupported).
 - **Essay feedback** — marked holistically against NESA band descriptors, with
   a band estimate per criterion (thesis, evidence, analysis, expression) and
   band history over time.
@@ -64,7 +66,7 @@ Economics · Business Studies
 
 ```
 api/                 Vercel serverless functions (Claude proxy — key stays server-side)
-  _lib.ts            Shared Anthropic client + JSON helpers (MODEL = "claude-sonnet-4-6")
+  _lib.ts            Shared Anthropic client + JSON helpers (MODEL, override via ANTHROPIC_MODEL)
   tutor.ts           Socratic tutor chat (weak-topic aware)
   mark.ts            Marks written practice responses against criteria
   essay.ts           Essay marking against NESA band descriptors

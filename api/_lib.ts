@@ -1,9 +1,10 @@
 import Anthropic from "@anthropic-ai/sdk";
 import type { VercelRequest, VercelResponse } from "@vercel/node";
 
-// The Claude model used across all StudyMate AI features. Swap this single
-// constant to migrate the whole app to a different model.
-export const MODEL = "claude-sonnet-4-6";
+// The Claude model used across all StudyMate AI features. Override it in one
+// place — set ANTHROPIC_MODEL in the Vercel environment to migrate the whole
+// app to a different model without a code change or redeploy of source.
+export const MODEL = process.env.ANTHROPIC_MODEL || "claude-sonnet-4-6";
 
 let client: Anthropic | null = null;
 

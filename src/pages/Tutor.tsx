@@ -6,13 +6,21 @@ import {
   type KeyboardEvent,
 } from "react";
 import { Badge, Button, cn } from "@/components/ui";
-import { ChatIcon, SparkIcon } from "@/components/icons";
+import {
+  ChatIcon,
+  MicIcon,
+  SparkIcon,
+  SpeakerOffIcon,
+  SpeakerOnIcon,
+  StopIcon,
+} from "@/components/icons";
 import { LogoMark } from "@/components/Logo";
 import { SUBJECTS, getSubject } from "@/data/subjects";
 import { useAuth } from "@/lib/auth";
 import { tutorReply } from "@/lib/claude";
 import { awardXp, fetchRecentAttempts } from "@/lib/firestore";
 import { weakestTopics, type TopicMastery } from "@/lib/mastery";
+import { useSpeechRecognition, useSpeechSynthesis } from "@/lib/speech";
 import { canUse, incrementUsage, remaining } from "@/lib/usage";
 import type { ChatMessage, SubjectId } from "@/types";
 
@@ -99,7 +107,11 @@ export default function Tutor() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [weak, setWeak] = useState<TopicMastery[]>([]);
+  const [ttsOn, setTtsOn] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
+  // Index of the last assistant message we've already read aloud, so toggling
+  // TTS on doesn't replay old messages and each new reply is spoken once.
+  const lastSpokenRef = useRef(-1);
 
   // The tutor references the student's real weak areas, so load them once.
   useEffect(() => {
@@ -119,12 +131,24 @@ export default function Tutor() {
   const left = remaining(uid, "tutor", premium);
   const blocked = !canUse(uid, "tutor", premium);
 
+  // Voice output (text-to-speech) and input (speech-to-text). Both degrade to
+  // a no-op on unsupported browsers, so the mic/speaker controls simply hide.
+  const synth = useSpeechSynthesis();
+  // A ref lets the recogniser's onFinal callback reach the latest `send`
+  // without re-creating the recogniser on every render.
+  const sendRef = useRef<(text: string) => void>(() => {});
+  const recog = useSpeechRecognition({
+    onFinal: (text) => sendRef.current(text),
+  });
+
   const send = async (text: string) => {
     if (!text.trim() || loading || !subjectId) return;
     if (blocked) {
       setError("You've used your free tutor messages today. Upgrade for unlimited.");
       return;
     }
+    // Interrupt any reply being read aloud when the student speaks/sends again.
+    synth.cancel();
     setError("");
     const nextMessages: ChatMessage[] = [
       ...messages,
@@ -133,7 +157,6 @@ export default function Tutor() {
     setMessages(nextMessages);
     setInput("");
     setLoading(true);
-    if (!premium) incrementUsage(uid, "tutor");
     try {
       const subjectWeak = weak
         .filter((w) => w.subjectId === subjectId)
@@ -144,6 +167,9 @@ export default function Tutor() {
         subjectWeak,
         profile?.displayName?.split(" ")[0],
       );
+      // Only count a successful exchange against the daily free allowance — a
+      // failed request (e.g. network drop) shouldn't burn a message.
+      if (!premium) incrementUsage(uid, "tutor");
       setMessages([...nextMessages, { role: "assistant", content: reply }]);
       if (user) void awardXp(user.uid, "tutorMessage", "tutorMessages");
     } catch (err) {
@@ -158,6 +184,42 @@ export default function Tutor() {
       setError(err instanceof Error ? err.message : "Request failed.");
     } finally {
       setLoading(false);
+    }
+  };
+
+  // Keep the recogniser's send callback pointing at the current closure.
+  useEffect(() => {
+    sendRef.current = (text: string) => void send(text);
+  });
+
+  // Read each new assistant reply aloud while voice output is on.
+  useEffect(() => {
+    if (!ttsOn) return;
+    const last = messages.length - 1;
+    if (last < 0) return;
+    const m = messages[last];
+    if (m.role === "assistant" && last > lastSpokenRef.current) {
+      lastSpokenRef.current = last;
+      synth.speak(m.content);
+    }
+  }, [messages, ttsOn, synth]);
+
+  // Toggle voice output; when turning on, skip replaying the current backlog.
+  const toggleTts = () => {
+    setTtsOn((on) => {
+      const next = !on;
+      if (next) lastSpokenRef.current = messages.length - 1;
+      else synth.cancel();
+      return next;
+    });
+  };
+
+  const onMicClick = () => {
+    if (recog.listening) {
+      recog.stop();
+    } else {
+      synth.cancel(); // don't talk over the student
+      recog.start();
     }
   };
 
@@ -254,11 +316,38 @@ export default function Tutor() {
           </div>
         </div>
         <div className="flex items-center gap-2">
+          {synth.supported && (
+            <button
+              onClick={toggleTts}
+              aria-pressed={ttsOn}
+              aria-label={
+                ttsOn ? "Turn off spoken replies" : "Read replies aloud"
+              }
+              title={ttsOn ? "Voice replies on" : "Read replies aloud"}
+              className={cn(
+                "grid h-9 w-9 place-items-center rounded-lg border transition",
+                ttsOn
+                  ? "border-brand-500/40 bg-brand-500/15 text-brand-200"
+                  : "border-white/10 bg-white/5 text-ink-300 hover:text-ink-100",
+              )}
+            >
+              {ttsOn ? (
+                <SpeakerOnIcon
+                  className={cn("h-[18px] w-[18px]", synth.speaking && "animate-pulse")}
+                />
+              ) : (
+                <SpeakerOffIcon className="h-[18px] w-[18px]" />
+              )}
+            </button>
+          )}
           <Badge tone={premium ? "brand" : left > 2 ? "neutral" : "amber"}>
             {premium ? "Unlimited" : `${Math.max(0, left)} left today`}
           </Badge>
           <button
             onClick={() => {
+              recog.stop();
+              synth.cancel();
+              lastSpokenRef.current = -1;
               setSubjectId(null);
               setMessages([]);
               setError("");
@@ -293,7 +382,7 @@ export default function Tutor() {
       </div>
 
       {/* Suggestions */}
-      {messages.length <= 1 && (
+      {messages.length <= 1 && !recog.listening && (
         <div className="mt-3 flex flex-wrap gap-2">
           {defaultSuggestions(subjectId).map((q) => (
             <button
@@ -307,24 +396,73 @@ export default function Tutor() {
         </div>
       )}
 
-      {error && (
-        <p className="mt-2 text-xs text-amber-300">{error}</p>
+      {/* Listening indicator */}
+      {recog.listening && (
+        <div className="mt-3 flex items-center gap-2.5 rounded-xl border border-red-500/30 bg-red-500/5 px-3.5 py-2.5">
+          <span className="relative flex h-2.5 w-2.5 shrink-0">
+            <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-red-400 opacity-75" />
+            <span className="relative inline-flex h-2.5 w-2.5 rounded-full bg-red-500" />
+          </span>
+          <p className="min-w-0 flex-1 truncate text-sm text-ink-200">
+            {recog.interim || "Listening… speak your question"}
+          </p>
+          <button
+            onClick={() => recog.stop()}
+            className="text-xs font-semibold text-red-300 hover:text-red-200"
+          >
+            Stop
+          </button>
+        </div>
+      )}
+
+      {(error || recog.error) && (
+        <p className="mt-2 text-xs text-amber-300">{error || recog.error}</p>
       )}
 
       {/* Composer */}
       <form onSubmit={onSubmit} className="mt-3 flex items-end gap-2">
         <textarea
-          className="input max-h-40 min-h-[52px] flex-1 resize-none py-3.5"
-          placeholder={`Ask your ${subject.short} tutor anything…`}
-          value={input}
+          className={cn(
+            "input max-h-40 min-h-[52px] flex-1 resize-none py-3.5",
+            recog.listening && "border-red-500/40 text-ink-300",
+          )}
+          placeholder={
+            recog.listening
+              ? "Listening…"
+              : `Ask your ${subject.short} tutor anything…`
+          }
+          value={recog.listening ? recog.interim : input}
           rows={1}
+          readOnly={recog.listening}
           onChange={(e) => setInput(e.target.value)}
           onKeyDown={onKeyDown}
         />
+        {recog.supported && (
+          <button
+            type="button"
+            onClick={onMicClick}
+            disabled={loading || blocked}
+            aria-pressed={recog.listening}
+            aria-label={recog.listening ? "Stop listening" : "Ask by voice"}
+            title={recog.listening ? "Stop listening" : "Ask by voice"}
+            className={cn(
+              "grid h-[52px] w-[52px] shrink-0 place-items-center rounded-xl border transition disabled:opacity-40",
+              recog.listening
+                ? "animate-pulse border-red-500/50 bg-red-500/15 text-red-300"
+                : "border-white/10 bg-white/5 text-ink-200 hover:border-brand-500/40 hover:text-brand-200",
+            )}
+          >
+            {recog.listening ? (
+              <StopIcon className="h-5 w-5" />
+            ) : (
+              <MicIcon className="h-5 w-5" />
+            )}
+          </button>
+        )}
         <Button
           type="submit"
           className="h-[52px] px-5"
-          disabled={!input.trim() || loading || blocked}
+          disabled={!input.trim() || loading || blocked || recog.listening}
         >
           Send
         </Button>
