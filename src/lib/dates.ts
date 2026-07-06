@@ -18,6 +18,39 @@ export function dayDiff(a: string, b: string): number {
   return Math.round((db - da) / 86_400_000);
 }
 
+/** Add n days to a yyyy-mm-dd key. */
+export function addDaysToKey(key: string, n: number): string {
+  const d = new Date(key + "T00:00:00Z");
+  d.setUTCDate(d.getUTCDate() + n);
+  return d.toISOString().slice(0, 10);
+}
+
+/** The last n day keys ending today (inclusive), oldest first. */
+export function lastNDayKeys(n: number, today: string = sydneyDayKey()): string[] {
+  const out: string[] = [];
+  for (let i = n - 1; i >= 0; i--) out.push(addDaysToKey(today, -i));
+  return out;
+}
+
+/** Short human label for a day key, e.g. "12 Mar". */
+export function dayLabel(key: string): string {
+  const d = new Date(key + "T00:00:00Z");
+  return new Intl.DateTimeFormat("en-AU", {
+    day: "numeric",
+    month: "short",
+    timeZone: "UTC",
+  }).format(d);
+}
+
+/** Weekday label for a day key, e.g. "Mon". */
+export function weekdayLabel(key: string): string {
+  const d = new Date(key + "T00:00:00Z");
+  return new Intl.DateTimeFormat("en-AU", {
+    weekday: "short",
+    timeZone: "UTC",
+  }).format(d);
+}
+
 /**
  * Given the previous streak and last-active day, compute the new streak for
  * activity happening on `today`.

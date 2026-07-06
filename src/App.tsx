@@ -7,9 +7,14 @@ import Login from "@/pages/Login";
 import Signup from "@/pages/Signup";
 import Onboarding from "@/pages/Onboarding";
 import Dashboard from "@/pages/Dashboard";
+import Review from "@/pages/Review";
 import Practice from "@/pages/Practice";
+import Flashcards from "@/pages/Flashcards";
 import Tutor from "@/pages/Tutor";
 import Essay from "@/pages/Essay";
+import Exam from "@/pages/Exam";
+import Planner from "@/pages/Planner";
+import ProgressPage from "@/pages/Progress";
 
 function DemoBanner() {
   const { configured } = useAuth();
@@ -31,6 +36,18 @@ function Shell({ children }: { children: React.ReactNode }) {
   );
 }
 
+const APP_ROUTES: { path: string; element: React.ReactNode }[] = [
+  { path: "/dashboard", element: <Dashboard /> },
+  { path: "/review", element: <Review /> },
+  { path: "/practice", element: <Practice /> },
+  { path: "/flashcards", element: <Flashcards /> },
+  { path: "/tutor", element: <Tutor /> },
+  { path: "/essay", element: <Essay /> },
+  { path: "/exam", element: <Exam /> },
+  { path: "/planner", element: <Planner /> },
+  { path: "/progress", element: <ProgressPage /> },
+];
+
 export default function App() {
   return (
     <>
@@ -47,38 +64,9 @@ export default function App() {
             </ProtectedRoute>
           }
         />
-        <Route
-          path="/dashboard"
-          element={
-            <Shell>
-              <Dashboard />
-            </Shell>
-          }
-        />
-        <Route
-          path="/practice"
-          element={
-            <Shell>
-              <Practice />
-            </Shell>
-          }
-        />
-        <Route
-          path="/tutor"
-          element={
-            <Shell>
-              <Tutor />
-            </Shell>
-          }
-        />
-        <Route
-          path="/essay"
-          element={
-            <Shell>
-              <Essay />
-            </Shell>
-          }
-        />
+        {APP_ROUTES.map(({ path, element }) => (
+          <Route key={path} path={path} element={<Shell>{element}</Shell>} />
+        ))}
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
     </>

@@ -60,6 +60,9 @@
   .btn-outline {
     @apply btn border border-brand-500/40 text-brand-200 hover:bg-brand-500/10;
   }
+  .btn-danger {
+    @apply btn bg-red-500/15 text-red-300 border border-red-500/30 hover:bg-red-500/25;
+  }
 
   .input {
     @apply w-full rounded-xl border border-white/10 bg-ink-850 px-3.5 py-2.5 text-sm text-ink-100
@@ -80,6 +83,20 @@
   .prose-tutor strong {
     @apply text-white font-semibold;
   }
+}
+
+/* 3D flip for flashcards */
+.perspective-1000 {
+  perspective: 1000px;
+}
+.preserve-3d {
+  transform-style: preserve-3d;
+}
+.backface-hidden {
+  backface-visibility: hidden;
+}
+.rotate-y-180 {
+  transform: rotateY(180deg);
 }
 
 /* Loading shimmer */

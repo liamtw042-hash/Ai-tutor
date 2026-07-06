@@ -1,6 +1,9 @@
 import type {
   ChatMessage,
   EssayFeedback,
+  GeneratedCard,
+  GeneratedQuestion,
+  PlanWeek,
   Question,
   WrittenFeedback,
 } from "@/types";
@@ -35,8 +38,10 @@ async function postJSON<T>(url: string, body: unknown): Promise<T> {
 export function tutorReply(
   subjectName: string,
   messages: ChatMessage[],
+  weakTopics: { topic: string; accuracy: number }[] = [],
+  studentName?: string,
 ): Promise<{ reply: string }> {
-  return postJSON("/api/tutor", { subjectName, messages });
+  return postJSON("/api/tutor", { subjectName, messages, weakTopics, studentName });
 }
 
 export function markWritten(
@@ -52,6 +57,40 @@ export function reviewEssay(
   questionType: string,
   maxBand: number,
   essay: string,
+  question?: string,
 ): Promise<EssayFeedback> {
-  return postJSON("/api/essay", { subjectName, questionType, maxBand, essay });
+  return postJSON("/api/essay", {
+    subjectName,
+    questionType,
+    maxBand,
+    essay,
+    question,
+  });
+}
+
+export function generateQuestions(
+  subjectName: string,
+  topic: string,
+  count: number,
+  type: "multiple-choice" | "short-answer" | "mixed",
+  difficulty: "foundation" | "standard" | "challenge",
+): Promise<{ questions: GeneratedQuestion[] }> {
+  return postJSON("/api/generate", { subjectName, topic, count, type, difficulty });
+}
+
+export function generateFlashcards(
+  subjectName: string,
+  topic: string,
+  count: number,
+): Promise<{ cards: GeneratedCard[] }> {
+  return postJSON("/api/flashcards", { subjectName, topic, count });
+}
+
+export function generatePlan(
+  exams: { subjectName: string; subjectId: string; date: string }[],
+  hoursPerWeek: number,
+  weakTopics: { subjectName: string; topic: string; accuracy: number }[],
+  todayKey: string,
+): Promise<{ summary: string; weeks: PlanWeek[] }> {
+  return postJSON("/api/plan", { exams, hoursPerWeek, weakTopics, todayKey });
 }

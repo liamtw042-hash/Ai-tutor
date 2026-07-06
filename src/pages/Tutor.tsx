@@ -11,6 +11,8 @@ import { LogoMark } from "@/components/Logo";
 import { SUBJECTS, getSubject } from "@/data/subjects";
 import { useAuth } from "@/lib/auth";
 import { tutorReply } from "@/lib/claude";
+import { awardXp, fetchRecentAttempts } from "@/lib/firestore";
+import { weakestTopics, type TopicMastery } from "@/lib/mastery";
 import { canUse, incrementUsage, remaining } from "@/lib/usage";
 import type { ChatMessage, SubjectId } from "@/types";
 
@@ -84,7 +86,7 @@ function Bubble({ msg }: { msg: ChatMessage }) {
 }
 
 export default function Tutor() {
-  const { profile } = useAuth();
+  const { user, profile, configured } = useAuth();
   const premium = profile?.premium ?? false;
   const uid = profile?.uid ?? "demo";
 
@@ -96,7 +98,16 @@ export default function Tutor() {
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const [weak, setWeak] = useState<TopicMastery[]>([]);
   const scrollRef = useRef<HTMLDivElement>(null);
+
+  // The tutor references the student's real weak areas, so load them once.
+  useEffect(() => {
+    if (!configured || !user) return;
+    fetchRecentAttempts(user.uid)
+      .then((a) => setWeak(weakestTopics(a, 4)))
+      .catch(() => undefined);
+  }, [configured, user]);
 
   useEffect(() => {
     scrollRef.current?.scrollTo({
@@ -111,7 +122,7 @@ export default function Tutor() {
   const send = async (text: string) => {
     if (!text.trim() || loading || !subjectId) return;
     if (blocked) {
-      setError("You've used your 5 free tutor messages today. Upgrade for unlimited.");
+      setError("You've used your free tutor messages today. Upgrade for unlimited.");
       return;
     }
     setError("");
@@ -124,11 +135,17 @@ export default function Tutor() {
     setLoading(true);
     if (!premium) incrementUsage(uid, "tutor");
     try {
+      const subjectWeak = weak
+        .filter((w) => w.subjectId === subjectId)
+        .map((w) => ({ topic: w.topic, accuracy: w.accuracy }));
       const { reply } = await tutorReply(
         getSubject(subjectId).name,
         nextMessages,
+        subjectWeak,
+        profile?.displayName?.split(" ")[0],
       );
       setMessages([...nextMessages, { role: "assistant", content: reply }]);
+      if (user) void awardXp(user.uid, "tutorMessage", "tutorMessages");
     } catch (err) {
       setMessages([
         ...nextMessages,
@@ -229,7 +246,11 @@ export default function Tutor() {
           </div>
           <div>
             <p className="font-semibold text-white">{subject.name} tutor</p>
-            <p className="text-xs text-ink-400">Socratic mode · guides, not tells</p>
+            <p className="text-xs text-ink-400">
+              Socratic mode · guides, not tells
+              {weak.some((w) => w.subjectId === subjectId) &&
+                " · knows your weak topics"}
+            </p>
           </div>
         </div>
         <div className="flex items-center gap-2">

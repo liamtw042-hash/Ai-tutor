@@ -10,9 +10,11 @@ import { sydneyDayKey } from "@/lib/dates";
 // ---------------------------------------------------------------------------
 
 export const FREE_LIMITS = {
-  practice: 10, // practice questions per day
-  tutor: 5, // AI tutor messages per day
-  essay: 2, // essay feedback submissions per day
+  practice: 15, // practice questions per day
+  tutor: 10, // AI tutor messages per day
+  essay: 1, // essay feedback submissions per day
+  generate: 1, // AI question-set generations per day
+  aiDeck: 1, // AI flashcard deck generations per day
 } as const;
 
 export type UsageKind = keyof typeof FREE_LIMITS;

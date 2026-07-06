@@ -1,11 +1,16 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Badge, Button, Card, EmptyState, Progress, cn } from "@/components/ui";
 import { DocIcon, SparkIcon, TargetIcon } from "@/components/icons";
 import { SUBJECTS, getSubject } from "@/data/subjects";
 import { useAuth } from "@/lib/auth";
 import { reviewEssay } from "@/lib/claude";
+import {
+  awardXp,
+  fetchEssayRecords,
+  saveEssayRecord,
+} from "@/lib/firestore";
 import { canUse, incrementUsage, remaining } from "@/lib/usage";
-import type { EssayFeedback, SubjectId } from "@/types";
+import type { EssayFeedback, EssayRecord, SubjectId } from "@/types";
 
 const QUESTION_TYPES = [
   "Essay / extended response",
@@ -24,7 +29,7 @@ function bandTone(band: number, max: number): "green" | "amber" | "red" {
 }
 
 export default function Essay() {
-  const { profile } = useAuth();
+  const { user, profile, configured } = useAuth();
   const premium = profile?.premium ?? false;
   const uid = profile?.uid ?? "demo";
 
@@ -33,10 +38,18 @@ export default function Essay() {
 
   const [subjectId, setSubjectId] = useState<SubjectId>(availableSubjects[0]);
   const [questionType, setQuestionType] = useState(QUESTION_TYPES[0]);
+  const [question, setQuestion] = useState("");
   const [essay, setEssay] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [fb, setFb] = useState<EssayFeedback | null>(null);
+  const [history, setHistory] = useState<EssayRecord[]>([]);
+
+  useEffect(() => {
+    if (configured && user) {
+      fetchEssayRecords(user.uid, 6).then(setHistory).catch(() => undefined);
+    }
+  }, [configured, user]);
 
   const subject = getSubject(subjectId);
   const wordCount = useMemo(
@@ -62,9 +75,15 @@ export default function Essay() {
         questionType,
         subject.bands,
         essay,
+        question.trim() || undefined,
       );
       setFb(result);
       if (!premium) incrementUsage(uid, "essay");
+      if (user) {
+        await saveEssayRecord(user.uid, subjectId, questionType, wordCount, result);
+        await awardXp(user.uid, "essaySubmitted", "essays");
+        fetchEssayRecords(user.uid, 6).then(setHistory).catch(() => undefined);
+      }
     } catch (err) {
       setError(
         err instanceof Error
@@ -132,9 +151,18 @@ export default function Essay() {
             </div>
           </div>
           <div>
+            <label className="label">The question (optional, sharpens marking)</label>
+            <textarea
+              className="input min-h-[56px] resize-y font-normal leading-relaxed"
+              placeholder="Paste the essay question or stimulus you were answering…"
+              value={question}
+              onChange={(e) => setQuestion(e.target.value)}
+            />
+          </div>
+          <div>
             <label className="label">Your response</label>
             <textarea
-              className="input min-h-[320px] resize-y font-normal leading-relaxed"
+              className="input min-h-[280px] resize-y font-normal leading-relaxed"
               placeholder="Paste your essay or extended response here…"
               value={essay}
               onChange={(e) => setEssay(e.target.value)}
@@ -189,13 +217,18 @@ export default function Essay() {
               <div className="space-y-3">
                 {fb.criteria.map((c) => (
                   <div key={c.name}>
-                    <div className="mb-1 flex items-center justify-between">
+                    <div className="mb-1 flex items-center justify-between gap-2">
                       <span className="text-sm font-medium text-ink-100">
                         {c.name}
                       </span>
-                      <Badge tone={bandTone(c.score, c.max)}>
-                        {c.score}/{c.max}
-                      </Badge>
+                      <span className="flex items-center gap-1.5">
+                        {c.band > 0 && (
+                          <Badge tone="neutral">Band {c.band}</Badge>
+                        )}
+                        <Badge tone={bandTone(c.score, c.max)}>
+                          {c.score}/{c.max}
+                        </Badge>
+                      </span>
                     </div>
                     <Progress
                       value={c.score / c.max}
@@ -237,6 +270,37 @@ export default function Essay() {
           )}
         </div>
       </div>
+
+      {/* Band history */}
+      {history.length > 0 && (
+        <div>
+          <h2 className="mb-3 font-semibold text-white">Your recent essays</h2>
+          <div className="flex flex-wrap gap-2">
+            {history.map((h) => (
+              <div
+                key={h.id}
+                className="flex items-center gap-2 rounded-xl border border-white/5 bg-white/[0.02] px-3 py-2"
+                title={`${h.questionType} · ${h.wordCount} words`}
+              >
+                <span aria-hidden>{getSubject(h.subjectId).icon}</span>
+                <span className="text-xs text-ink-400">
+                  {new Date(h.createdAt).toLocaleDateString("en-AU", {
+                    day: "numeric",
+                    month: "short",
+                  })}
+                </span>
+                <Badge tone={bandTone(h.band, h.maxBand)}>
+                  Band {h.band}/{h.maxBand}
+                </Badge>
+              </div>
+            ))}
+          </div>
+          <p className="mt-2 text-xs text-ink-500">
+            Band trajectory over time lives in{" "}
+            <span className="text-brand-300">Progress</span>.
+          </p>
+        </div>
+      )}
     </div>
   );
 }

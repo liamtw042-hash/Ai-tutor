@@ -1,20 +1,30 @@
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import { useSearchParams } from "react-router-dom";
-import { Badge, Button, Card, cn } from "@/components/ui";
+import { Badge, Button, Card, Modal, cn } from "@/components/ui";
 import {
   BoltIcon,
   CheckIcon,
   SparkIcon,
   TargetIcon,
+  WandIcon,
   XIcon,
 } from "@/components/icons";
 import { SUBJECTS, getSubject } from "@/data/subjects";
 import { questionsForSubject } from "@/data/questions";
 import { useAuth } from "@/lib/auth";
-import { recordAttempt } from "@/lib/firestore";
-import { markWritten } from "@/lib/claude";
+import {
+  awardXp,
+  recordAttempt,
+  scheduleQuestionReview,
+} from "@/lib/firestore";
+import { generateQuestions, markWritten } from "@/lib/claude";
 import { canUse, incrementUsage, remaining } from "@/lib/usage";
-import type { Question, SubjectId, WrittenFeedback } from "@/types";
+import type {
+  GeneratedQuestion,
+  Question,
+  SubjectId,
+  WrittenFeedback,
+} from "@/types";
 
 const TYPE_LABEL: Record<string, string> = {
   "multiple-choice": "Multiple choice",
@@ -22,7 +32,7 @@ const TYPE_LABEL: Record<string, string> = {
   "extended-response": "Extended response",
 };
 
-function LimitBanner({ used }: { used: number }) {
+function LimitBanner() {
   return (
     <Card className="flex flex-col items-center gap-3 border-brand-500/30 bg-brand-500/5 text-center sm:flex-row sm:text-left">
       <div className="grid h-11 w-11 shrink-0 place-items-center rounded-xl bg-brand-500/15 text-brand-300 ring-1 ring-inset ring-brand-500/25">
@@ -30,10 +40,11 @@ function LimitBanner({ used }: { used: number }) {
       </div>
       <div className="flex-1">
         <p className="font-semibold text-white">
-          You've hit your free daily limit ({used} questions)
+          You've hit your free daily limit
         </p>
         <p className="text-sm text-ink-400">
-          Upgrade to Premium for unlimited practice, or come back tomorrow.
+          Upgrade to Premium for unlimited practice, or clear your review queue
+          — reviews are always unlimited.
         </p>
       </div>
     </Card>
@@ -99,11 +110,7 @@ function WrittenPanel({
         </div>
         <p className="text-sm text-ink-200">{fb.summary}</p>
         <FeedbackList title="Strengths" tone="green" items={fb.strengths} />
-        <FeedbackList
-          title="To improve"
-          tone="amber"
-          items={fb.improvements}
-        />
+        <FeedbackList title="To improve" tone="amber" items={fb.improvements} />
         <FeedbackList
           title="A full-mark answer covers"
           tone="brand"
@@ -174,6 +181,152 @@ function FeedbackList({
   );
 }
 
+// --- AI question generator modal ---
+function GenerateModal({
+  open,
+  onClose,
+  subjectId,
+  topics,
+  uid,
+  premium,
+  onGenerated,
+}: {
+  open: boolean;
+  onClose: () => void;
+  subjectId: SubjectId;
+  topics: string[];
+  uid: string;
+  premium: boolean;
+  onGenerated: (qs: Question[]) => void;
+}) {
+  const subject = getSubject(subjectId);
+  const [topic, setTopic] = useState(topics[0] ?? "");
+  const [type, setType] = useState<"multiple-choice" | "short-answer" | "mixed">(
+    "mixed",
+  );
+  const [difficulty, setDifficulty] = useState<
+    "foundation" | "standard" | "challenge"
+  >("standard");
+  const [busy, setBusy] = useState(false);
+  const [error, setError] = useState("");
+  const left = remaining(uid, "generate", premium);
+
+  const run = async () => {
+    setError("");
+    if (!canUse(uid, "generate", premium)) {
+      setError(
+        "You've used today's free AI generation. Upgrade for unlimited fresh questions.",
+      );
+      return;
+    }
+    setBusy(true);
+    try {
+      const res = await generateQuestions(
+        subject.name,
+        topic || subject.topics[0],
+        3,
+        type,
+        difficulty,
+      );
+      if (!premium) incrementUsage(uid, "generate");
+      const now = Date.now();
+      const qs: Question[] = res.questions.map(
+        (g: GeneratedQuestion, i: number) => ({
+          id: `gen-${subjectId}-${now}-${i}`,
+          subjectId,
+          topic: g.topic,
+          type: g.type,
+          marks: g.marks,
+          prompt: g.prompt,
+          options: g.options,
+          correctIndex: g.correctIndex,
+          solution: g.solution,
+          markingCriteria: g.markingCriteria,
+          difficulty: g.difficulty,
+          generated: true,
+        }),
+      );
+      onGenerated(qs);
+      onClose();
+    } catch (err) {
+      setError(
+        err instanceof Error
+          ? err.message
+          : "Generation failed. Is the API deployed?",
+      );
+    } finally {
+      setBusy(false);
+    }
+  };
+
+  return (
+    <Modal open={open} onClose={onClose} title="Generate fresh questions">
+      <div className="space-y-4">
+        <p className="text-sm text-ink-300">
+          AI writes 3 original, HSC-style questions on any {subject.short} topic
+          — exam command verbs, plausible distractors, full solutions.
+        </p>
+        <div>
+          <label className="label">Topic</label>
+          <select
+            className="input"
+            value={topic}
+            onChange={(e) => setTopic(e.target.value)}
+          >
+            {subject.topics.map((t) => (
+              <option key={t} value={t}>
+                {t}
+              </option>
+            ))}
+          </select>
+        </div>
+        <div className="grid grid-cols-2 gap-3">
+          <div>
+            <label className="label">Type</label>
+            <select
+              className="input"
+              value={type}
+              onChange={(e) => setType(e.target.value as typeof type)}
+            >
+              <option value="mixed">Mixed</option>
+              <option value="multiple-choice">Multiple choice</option>
+              <option value="short-answer">Short answer</option>
+            </select>
+          </div>
+          <div>
+            <label className="label">Difficulty</label>
+            <select
+              className="input"
+              value={difficulty}
+              onChange={(e) =>
+                setDifficulty(e.target.value as typeof difficulty)
+              }
+            >
+              <option value="foundation">Foundation</option>
+              <option value="standard">Standard</option>
+              <option value="challenge">Challenge</option>
+            </select>
+          </div>
+        </div>
+        {!premium && (
+          <p className="text-xs text-ink-500">
+            Free plan: {left} generation{left === 1 ? "" : "s"} left today
+          </p>
+        )}
+        {error && (
+          <p className="rounded-lg border border-red-500/20 bg-red-500/10 px-3 py-2 text-sm text-red-300">
+            {error}
+          </p>
+        )}
+        <Button className="w-full" onClick={run} loading={busy}>
+          <WandIcon className="h-4 w-4" />
+          {busy ? "Writing questions…" : "Generate 3 questions"}
+        </Button>
+      </div>
+    </Modal>
+  );
+}
+
 export default function Practice() {
   const { profile } = useAuth();
   const [params, setParams] = useSearchParams();
@@ -190,19 +343,20 @@ export default function Practice() {
       : availableSubjects[0];
 
   const [subjectId, setSubjectId] = useState<SubjectId>(initialSubject);
-  const [topic, setTopic] = useState<string>("All topics");
+  const [topic, setTopic] = useState<string>(params.get("topic") || "All topics");
   const [index, setIndex] = useState(0);
   const [selected, setSelected] = useState<number | null>(null);
   const [revealed, setRevealed] = useState(false);
-  const [used, setUsed] = useState(0);
-
-  useEffect(() => {
-    setUsed(profile ? 0 : 0);
-  }, [profile]);
+  const [genOpen, setGenOpen] = useState(false);
+  const [generated, setGenerated] = useState<Question[]>([]);
+  const [sessionXp, setSessionXp] = useState(0);
 
   const allQuestions = useMemo(
-    () => questionsForSubject(subjectId),
-    [subjectId],
+    () => [
+      ...generated.filter((q) => q.subjectId === subjectId),
+      ...questionsForSubject(subjectId),
+    ],
+    [subjectId, generated],
   );
   const topics = useMemo(
     () => ["All topics", ...new Set(allQuestions.map((q) => q.topic))],
@@ -233,40 +387,48 @@ export default function Practice() {
     setRevealed(false);
   }
 
+  /** Persist an outcome: attempt record + SRS scheduling + XP. */
+  const persistOutcome = async (q: Question, correct: boolean | null, awarded: number, total: number) => {
+    if (!premium) incrementUsage(uid, "practice");
+    if (!profile) return;
+    const gotIt = correct === null ? awarded / Math.max(total, 1) >= 0.5 : correct;
+    try {
+      await recordAttempt(profile.uid, {
+        questionId: q.id,
+        subjectId: q.subjectId,
+        topic: q.topic,
+        type: q.type,
+        correct,
+        awardedMarks: awarded,
+        totalMarks: total,
+      });
+      await scheduleQuestionReview(profile.uid, q, gotIt);
+      const xp = await awardXp(
+        profile.uid,
+        gotIt ? "questionCorrect" : "questionAttempted",
+        "questions",
+      );
+      setSessionXp((x) => x + xp);
+    } catch (err) {
+      console.error("Failed to persist attempt", err);
+    }
+  };
+
   const answerMC = (i: number) => {
     if (revealed || !question) return;
     setSelected(i);
     setRevealed(true);
-    const correct = i === question.correctIndex;
-    if (!premium) incrementUsage(uid, "practice");
-    setUsed((u) => u + 1);
-    if (profile) {
-      void recordAttempt(profile.uid, {
-        questionId: question.id,
-        subjectId: question.subjectId,
-        topic: question.topic,
-        type: question.type,
-        correct,
-        awardedMarks: correct ? question.marks : 0,
-        totalMarks: question.marks,
-      });
-    }
+    void persistOutcome(
+      question,
+      i === question.correctIndex,
+      i === question.correctIndex ? question.marks : 0,
+      question.marks,
+    );
   };
 
   const onWrittenGraded = (fb: WrittenFeedback) => {
-    if (!premium) incrementUsage(uid, "practice");
-    setUsed((u) => u + 1);
-    if (profile && question) {
-      void recordAttempt(profile.uid, {
-        questionId: question.id,
-        subjectId: question.subjectId,
-        topic: question.topic,
-        type: question.type,
-        correct: null,
-        awardedMarks: fb.awardedMarks,
-        totalMarks: fb.totalMarks,
-      });
-    }
+    if (!question) return;
+    void persistOutcome(question, null, fb.awardedMarks, fb.totalMarks);
   };
 
   const next = () => resetQuestion((index + 1) % questions.length);
@@ -277,18 +439,25 @@ export default function Practice() {
         <div>
           <h1 className="font-display text-3xl font-bold text-white">Practice</h1>
           <p className="mt-1 text-ink-300">
-            Exam-style questions with instant feedback and AI marking.
+            Every answer feeds your mastery map and spaced-repetition queue.
           </p>
         </div>
-        <Badge tone={premium ? "brand" : left > 3 ? "neutral" : "amber"}>
-          {premium ? (
-            <>
-              <SparkIcon className="h-3.5 w-3.5" /> Unlimited
-            </>
-          ) : (
-            `${Math.max(0, left)} free left today`
+        <div className="flex items-center gap-2">
+          {sessionXp > 0 && (
+            <Badge tone="brand">
+              <SparkIcon className="h-3.5 w-3.5" /> +{sessionXp} XP
+            </Badge>
           )}
-        </Badge>
+          <Badge tone={premium ? "brand" : left > 3 ? "neutral" : "amber"}>
+            {premium ? (
+              <>
+                <SparkIcon className="h-3.5 w-3.5" /> Unlimited
+              </>
+            ) : (
+              `${Math.max(0, left)} free left today`
+            )}
+          </Badge>
+        </div>
       </div>
 
       {/* Subject tabs */}
@@ -314,8 +483,8 @@ export default function Practice() {
         })}
       </div>
 
-      {/* Topic filter */}
-      <div className="flex flex-wrap gap-2">
+      {/* Topic filter + generate */}
+      <div className="flex flex-wrap items-center gap-2">
         {topics.map((t) => (
           <button
             key={t}
@@ -333,10 +502,16 @@ export default function Practice() {
             {t}
           </button>
         ))}
+        <button
+          onClick={() => setGenOpen(true)}
+          className="chip border-brand-500/40 text-brand-200 transition hover:bg-brand-500/10"
+        >
+          <WandIcon className="h-3.5 w-3.5" /> Generate new
+        </button>
       </div>
 
       {blocked ? (
-        <LimitBanner used={used} />
+        <LimitBanner />
       ) : !question ? (
         <Card>No questions found for this filter.</Card>
       ) : (
@@ -348,6 +523,11 @@ export default function Practice() {
             <Badge tone="brand">
               {question.marks} mark{question.marks === 1 ? "" : "s"}
             </Badge>
+            {question.generated && (
+              <Badge tone="amber">
+                <WandIcon className="h-3 w-3" /> AI-generated
+              </Badge>
+            )}
             {question.outcomes?.map((o) => (
               <span key={o} className="text-[11px] text-ink-500">
                 {o}
@@ -369,14 +549,13 @@ export default function Practice() {
                 {question.options?.map((opt, i) => {
                   const isCorrect = i === question.correctIndex;
                   const isChosen = i === selected;
-                  const state =
-                    !revealed
-                      ? "idle"
-                      : isCorrect
-                        ? "correct"
-                        : isChosen
-                          ? "wrong"
-                          : "idle";
+                  const state = !revealed
+                    ? "idle"
+                    : isCorrect
+                      ? "correct"
+                      : isChosen
+                        ? "wrong"
+                        : "idle";
                   return (
                     <button
                       key={i}
@@ -433,6 +612,11 @@ export default function Practice() {
               <p className="whitespace-pre-line text-sm leading-relaxed text-ink-200">
                 {question.solution}
               </p>
+              <p className="mt-2 border-t border-white/5 pt-2 text-[11px] text-ink-500">
+                {selected === question.correctIndex
+                  ? "Scheduled for review before you'd forget it."
+                  : "You'll see this again tomorrow — that's the system working."}
+              </p>
             </div>
           )}
           {question.type !== "multiple-choice" && (
@@ -459,9 +643,7 @@ export default function Practice() {
           <div className="mt-6 flex items-center justify-between">
             <button
               onClick={() =>
-                resetQuestion(
-                  (index - 1 + questions.length) % questions.length,
-                )
+                resetQuestion((index - 1 + questions.length) % questions.length)
               }
               className="text-sm text-ink-400 hover:text-ink-100"
             >
@@ -473,6 +655,20 @@ export default function Practice() {
           </div>
         </Card>
       )}
+
+      <GenerateModal
+        open={genOpen}
+        onClose={() => setGenOpen(false)}
+        subjectId={subjectId}
+        topics={getSubject(subjectId).topics}
+        uid={uid}
+        premium={premium}
+        onGenerated={(qs) => {
+          setGenerated((prev) => [...qs, ...prev]);
+          setTopic("All topics");
+          resetQuestion(0);
+        }}
+      />
     </div>
   );
 }

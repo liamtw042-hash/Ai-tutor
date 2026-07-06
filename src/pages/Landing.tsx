@@ -1,46 +1,89 @@
 import { Link } from "react-router-dom";
+import { motion } from "framer-motion";
 import { Logo } from "@/components/Logo";
 import { Badge } from "@/components/ui";
 import { SUBJECTS } from "@/data/subjects";
 import {
   ArrowRightIcon,
   BoltIcon,
-  CheckIcon,
+  BrainIcon,
+  CalendarIcon,
+  CardsIcon,
+  ChartIcon,
   ChatIcon,
+  CheckIcon,
+  ClockIcon,
   DocIcon,
+  FlameIcon,
   PenIcon,
   SparkIcon,
-  TargetIcon,
 } from "@/components/icons";
 import { useAuth } from "@/lib/auth";
 
 const FEATURES = [
   {
+    icon: BrainIcon,
+    title: "Spaced repetition that actually works",
+    body: "A real SM-2 engine schedules every question and flashcard for the moment before you'd forget it. Apps with true spaced repetition hit ~89% retention vs ~74% without — that's the gap between Band 4 and Band 6.",
+  },
+  {
     icon: PenIcon,
-    title: "Real HSC-style practice",
-    body: "Bank of exam-style questions organised by subject and topic — multiple choice, short answer and extended response, with instant feedback.",
+    title: "HSC-style practice, endless supply",
+    body: "A curated bank of exam-style questions per subject — plus AI that writes fresh, NESA-authentic questions on any syllabus topic, on demand.",
   },
   {
     icon: ChatIcon,
     title: "A tutor that asks, not tells",
-    body: "Your AI tutor uses the Socratic method to guide you to the answer, so you actually understand it — not just copy it.",
+    body: "The AI tutor knows your weak topics and uses the Socratic method — guiding you to the answer with questions, the way a great $90/hr tutor does.",
+  },
+  {
+    icon: CardsIcon,
+    title: "Flashcards, made or generated",
+    body: "Build decks yourself or generate them from any topic in seconds. Study with flip, write and match modes — all feeding the same memory engine.",
   },
   {
     icon: DocIcon,
     title: "Essay marking against NESA bands",
-    body: "Paste an extended response and get structured feedback on thesis, evidence, analysis and expression, scored against the marking criteria.",
+    body: "Structured feedback on thesis, evidence, analysis and expression — each criterion placed on the band scale, with your scores tracked over time.",
   },
   {
-    icon: TargetIcon,
-    title: "Know your weak topics",
-    body: "Every attempt is tracked so you can see exactly which syllabus areas need work before the exam.",
+    icon: ClockIcon,
+    title: "Past-paper mode under real pressure",
+    body: "Timed exam sessions marked by AI against NESA criteria, so the real thing feels familiar instead of terrifying.",
+  },
+  {
+    icon: CalendarIcon,
+    title: "A study plan built around your exams",
+    body: "Enter your exam dates and available hours — get a week-by-week schedule that weights your weak topics and switches to past papers as exams close in.",
+  },
+  {
+    icon: ChartIcon,
+    title: "Progress you can actually see",
+    body: "Streaks, XP, mastery per topic, accuracy trends and a study heatmap — real data from your work, never inflated numbers.",
   },
 ];
 
-const STEPS = [
-  { n: "01", t: "Pick your subjects", d: "Choose from all 10 major HSC courses during a 30-second setup." },
-  { n: "02", t: "Practise & ask", d: "Work through questions and chat to your tutor whenever you're stuck." },
-  { n: "03", t: "Get exam-ready", d: "Track weak topics, refine essays, and walk in confident." },
+const LOOP = [
+  {
+    icon: FlameIcon,
+    t: "Show up",
+    d: "A daily goal and streak make 20 minutes a day the default, not the exception.",
+  },
+  {
+    icon: BrainIcon,
+    t: "Recall, don't re-read",
+    d: "Everything is active recall — questions and flashcards, never passive highlighting.",
+  },
+  {
+    icon: BoltIcon,
+    t: "Review on schedule",
+    d: "Spaced repetition resurfaces exactly what you're about to forget. Ten minutes clears it.",
+  },
+  {
+    icon: ChartIcon,
+    t: "Attack weak spots",
+    d: "Your dashboard always knows the topics costing you marks — and points your next session at them.",
+  },
 ];
 
 export default function Landing() {
@@ -54,6 +97,9 @@ export default function Landing() {
         <div className="mx-auto flex max-w-6xl items-center justify-between px-4 py-3.5 sm:px-6">
           <Logo />
           <div className="flex items-center gap-2">
+            <a href="#pricing" className="btn-ghost hidden sm:inline-flex">
+              Pricing
+            </a>
             <Link to="/login" className="btn-ghost hidden sm:inline-flex">
               Log in
             </Link>
@@ -68,39 +114,58 @@ export default function Landing() {
       <section className="relative overflow-hidden">
         <div className="mx-auto max-w-6xl px-4 pb-16 pt-16 sm:px-6 sm:pt-24">
           <div className="mx-auto max-w-3xl text-center">
-            <div className="mb-5 flex justify-center animate-fade-in">
+            <motion.div
+              className="mb-5 flex justify-center"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+            >
               <Badge tone="brand">
                 <SparkIcon className="h-3.5 w-3.5" /> Built for the NSW HSC —
                 aligned to NESA syllabuses
               </Badge>
-            </div>
-            <h1 className="animate-fade-up font-display text-4xl font-extrabold leading-[1.05] tracking-tight text-white sm:text-6xl">
-              Ace the HSC with a tutor
+            </motion.div>
+            <motion.h1
+              className="font-display text-4xl font-extrabold leading-[1.05] tracking-tight text-white sm:text-6xl"
+              initial={{ opacity: 0, y: 14 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5 }}
+            >
+              The tutor that remembers
               <br />
-              that works{" "}
               <span className="bg-gradient-to-r from-brand-300 via-brand-400 to-brand-500 bg-clip-text text-transparent">
-                the way you do
+                what you forget
               </span>
-            </h1>
-            <p className="mx-auto mt-6 max-w-2xl animate-fade-up text-lg text-ink-300 [animation-delay:80ms]">
-              StudyMate HSC gives NSW students exam-style practice, an AI tutor
-              that guides instead of spoon-feeds, and essay feedback marked
-              against real NESA criteria. Study smarter for every Band 6.
-            </p>
-            <div className="mt-9 flex animate-fade-up flex-col items-center justify-center gap-3 [animation-delay:160ms] sm:flex-row">
+            </motion.h1>
+            <motion.p
+              className="mx-auto mt-6 max-w-2xl text-lg text-ink-300"
+              initial={{ opacity: 0, y: 14 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5, delay: 0.08 }}
+            >
+              Private tutors cost $50–90 an hour and see you once a week.
+              StudyMate combines spaced repetition, endless HSC-style practice
+              and a Socratic AI tutor that knows your weak topics — every day,
+              for less than a single tutoring session a month.
+            </motion.p>
+            <motion.div
+              className="mt-9 flex flex-col items-center justify-center gap-3 sm:flex-row"
+              initial={{ opacity: 0, y: 14 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5, delay: 0.16 }}
+            >
               <Link to={goto} className="btn-primary px-6 py-3 text-base">
                 Start studying free <ArrowRightIcon className="h-5 w-5" />
               </Link>
-              <a href="#features" className="btn-ghost px-6 py-3 text-base">
-                See how it works
+              <a href="#method" className="btn-ghost px-6 py-3 text-base">
+                Why it works
               </a>
-            </div>
+            </motion.div>
             <p className="mt-4 text-sm text-ink-500">
               Free forever plan · No credit card · 10 subjects
             </p>
           </div>
 
-          {/* subject marquee */}
+          {/* subject chips */}
           <div className="mt-16 flex flex-wrap justify-center gap-2.5">
             {SUBJECTS.map((s) => (
               <span
@@ -116,6 +181,41 @@ export default function Landing() {
         </div>
       </section>
 
+      {/* The method */}
+      <section id="method" className="border-y border-white/5 bg-ink-900/30">
+        <div className="mx-auto max-w-6xl px-4 py-16 sm:px-6">
+          <div className="mb-10 text-center">
+            <div className="mb-2 text-xs font-semibold uppercase tracking-widest text-brand-300">
+              The science, not the vibes
+            </div>
+            <h2 className="font-display text-3xl font-bold text-white sm:text-4xl">
+              Built on the loop that makes studying stick
+            </h2>
+            <p className="mx-auto mt-3 max-w-2xl text-ink-300">
+              Re-reading notes feels productive and does almost nothing. Active
+              recall + spaced repetition + a daily habit is what the memory
+              research actually supports — so that's the whole product.
+            </p>
+          </div>
+          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+            {LOOP.map(({ icon: Icon, t, d }, i) => (
+              <div key={t} className="relative rounded-2xl border border-white/5 bg-ink-900/50 p-6">
+                <div className="mb-4 flex items-center gap-3">
+                  <div className="grid h-10 w-10 place-items-center rounded-xl bg-brand-500/15 text-brand-300 ring-1 ring-inset ring-brand-500/25">
+                    <Icon className="h-5 w-5" />
+                  </div>
+                  <span className="font-display text-2xl font-bold text-brand-500/50">
+                    {i + 1}
+                  </span>
+                </div>
+                <h3 className="font-semibold text-white">{t}</h3>
+                <p className="mt-1.5 text-sm leading-relaxed text-ink-300">{d}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
       {/* Features */}
       <section id="features" className="mx-auto max-w-6xl px-4 py-16 sm:px-6">
         <div className="mb-10 text-center">
@@ -123,10 +223,10 @@ export default function Landing() {
             Everything in one place
           </div>
           <h2 className="font-display text-3xl font-bold text-white sm:text-4xl">
-            Four tools that actually move your marks
+            Eight tools that move your marks
           </h2>
         </div>
-        <div className="grid gap-4 sm:grid-cols-2">
+        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
           {FEATURES.map(({ icon: Icon, title, body }) => (
             <div
               key={title}
@@ -135,25 +235,24 @@ export default function Landing() {
               <div className="mb-4 grid h-11 w-11 place-items-center rounded-xl bg-brand-500/15 text-brand-300 ring-1 ring-inset ring-brand-500/25">
                 <Icon className="h-5 w-5" />
               </div>
-              <h3 className="text-lg font-semibold text-white">{title}</h3>
+              <h3 className="font-semibold text-white">{title}</h3>
               <p className="mt-2 text-sm leading-relaxed text-ink-300">{body}</p>
             </div>
           ))}
         </div>
       </section>
 
-      {/* How it works */}
-      <section className="mx-auto max-w-6xl px-4 py-12 sm:px-6">
-        <div className="grid gap-4 sm:grid-cols-3">
-          {STEPS.map((s) => (
-            <div key={s.n} className="rounded-2xl border border-white/5 p-6">
-              <div className="font-display text-3xl font-bold text-brand-500/60">
-                {s.n}
-              </div>
-              <h3 className="mt-3 font-semibold text-white">{s.t}</h3>
-              <p className="mt-1.5 text-sm text-ink-300">{s.d}</p>
-            </div>
-          ))}
+      {/* Honest social proof */}
+      <section className="mx-auto max-w-4xl px-4 py-8 sm:px-6">
+        <div className="rounded-2xl border border-white/5 bg-ink-900/50 p-6 text-center sm:p-8">
+          <p className="text-sm leading-relaxed text-ink-300">
+            <span className="font-semibold text-white">Straight up:</span>{" "}
+            StudyMate is new and pre-launch, and we're not going to invent fake
+            testimonials to pretend otherwise. The learning science it's built
+            on — the testing effect, SM-2 spaced repetition, Socratic tutoring —
+            has decades of evidence behind it. Try the free plan, judge it on
+            your own marks, and tell us what to build next.
+          </p>
         </div>
       </section>
 
@@ -166,13 +265,17 @@ export default function Landing() {
           <h2 className="font-display text-3xl font-bold text-white sm:text-4xl">
             Start free. Upgrade when you're serious.
           </h2>
+          <p className="mx-auto mt-3 max-w-xl text-ink-300">
+            One month of Premium costs less than 15 minutes with a private
+            tutor.
+          </p>
         </div>
         <div className="grid items-start gap-5 md:grid-cols-2">
           {/* Free */}
           <div className="card p-7">
             <h3 className="text-lg font-semibold text-white">Free</h3>
             <p className="mt-1 text-sm text-ink-400">
-              Everything you need to get moving.
+              The full study loop, every day.
             </p>
             <div className="mt-5 flex items-baseline gap-1">
               <span className="font-display text-4xl font-bold text-white">$0</span>
@@ -180,10 +283,12 @@ export default function Landing() {
             </div>
             <ul className="mt-6 space-y-3 text-sm">
               {[
-                "10 practice questions per day",
-                "5 AI tutor messages per day",
-                "Basic essay feedback",
-                "All 10 subjects & topic tracking",
+                "15 practice questions per day",
+                "Unlimited spaced-repetition reviews",
+                "10 AI tutor messages per day",
+                "1 essay review per day",
+                "Flashcard decks + all study modes",
+                "Streaks, XP, badges & daily goals",
               ].map((f) => (
                 <li key={f} className="flex items-start gap-2.5 text-ink-200">
                   <CheckIcon className="mt-0.5 h-4 w-4 shrink-0 text-emerald-400" />
@@ -200,7 +305,7 @@ export default function Landing() {
           <div className="card relative overflow-hidden border-brand-500/40 p-7 shadow-glow">
             <div className="absolute right-5 top-5">
               <Badge tone="brand">
-                <BoltIcon className="h-3.5 w-3.5" /> Most popular
+                <BoltIcon className="h-3.5 w-3.5" /> Serious mode
               </Badge>
             </div>
             <h3 className="text-lg font-semibold text-white">Premium</h3>
@@ -215,11 +320,12 @@ export default function Landing() {
             </div>
             <ul className="mt-6 space-y-3 text-sm">
               {[
-                "Unlimited practice questions",
-                "Unlimited AI tutor messages",
-                "Detailed essay marking & rewrites",
-                "Advanced analytics & weak-topic insights",
-                "Past paper exam mode",
+                "Unlimited practice, tutoring & essay marking",
+                "Unlimited AI question & flashcard generation",
+                "Timed past-paper exam mode, AI-marked",
+                "Personalised study plan to your exam dates",
+                "Full progress analytics",
+                "Everything in Free, uncapped",
               ].map((f) => (
                 <li key={f} className="flex items-start gap-2.5 text-ink-100">
                   <CheckIcon className="mt-0.5 h-4 w-4 shrink-0 text-brand-300" />
@@ -241,8 +347,8 @@ export default function Landing() {
             Your HSC won't study for itself.
           </h2>
           <p className="mx-auto mt-3 max-w-xl text-ink-300">
-            Join StudyMate and turn revision into real marks — one question at a
-            time.
+            Twenty minutes a day, aimed at exactly the right topics. Start the
+            streak tonight.
           </p>
           <Link
             to={goto}

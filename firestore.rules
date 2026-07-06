@@ -15,12 +15,44 @@ service cloud.firestore {
     match /users/{uid} {
       allow read, write: if isOwner(uid);
 
-      match /attempts/{attemptId} {
+      match /attempts/{id} {
         allow read, write: if isOwner(uid);
       }
-      match /sessions/{sessionId} {
+      match /sessions/{id} {
         allow read, write: if isOwner(uid);
       }
+      match /srs/{id} {
+        allow read, write: if isOwner(uid);
+      }
+      match /days/{id} {
+        allow read, write: if isOwner(uid);
+      }
+      match /decks/{deckId} {
+        allow read, write: if isOwner(uid);
+        match /cards/{cardId} {
+          allow read, write: if isOwner(uid);
+        }
+      }
+      match /exams/{id} {
+        allow read, write: if isOwner(uid);
+      }
+      match /essays/{id} {
+        allow read, write: if isOwner(uid);
+      }
+      match /plans/{id} {
+        allow read, write: if isOwner(uid);
+      }
+    }
+
+    // Opt-in leaderboard: any signed-in user can read; each user may only
+    // create/update/delete their own entry, with a sane shape.
+    match /leaderboard/{uid} {
+      allow read: if signedIn();
+      allow create, update: if isOwner(uid)
+        && request.resource.data.xp is number
+        && request.resource.data.alias is string
+        && request.resource.data.alias.size() <= 40;
+      allow delete: if isOwner(uid);
     }
 
     // The shared question bank is world-readable to signed-in users and only

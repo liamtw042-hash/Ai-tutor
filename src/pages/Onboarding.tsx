@@ -5,16 +5,25 @@ import { Button, cn } from "@/components/ui";
 import { CheckIcon } from "@/components/icons";
 import { SUBJECTS } from "@/data/subjects";
 import { useAuth } from "@/lib/auth";
+import { saveDailyGoal } from "@/lib/firestore";
 import type { SubjectId } from "@/types";
 
+const GOALS = [
+  { value: 10, label: "Casual", desc: "10 a day — keep the streak alive" },
+  { value: 20, label: "Serious", desc: "20 a day — steady mark gains" },
+  { value: 35, label: "All-in", desc: "35 a day — trials & HSC season" },
+];
+
 export default function Onboarding() {
-  const { profile, saveSubjects, configured } = useAuth();
+  const { user, profile, saveSubjects, configured, refreshProfile } = useAuth();
   const navigate = useNavigate();
   const [selected, setSelected] = useState<SubjectId[]>([]);
+  const [goal, setGoal] = useState(20);
   const [saving, setSaving] = useState(false);
 
   useEffect(() => {
     if (profile?.subjects?.length) setSelected(profile.subjects);
+    if (profile?.dailyGoal) setGoal(profile.dailyGoal);
   }, [profile]);
 
   const toggle = (id: SubjectId) =>
@@ -25,7 +34,11 @@ export default function Onboarding() {
   const finish = async () => {
     setSaving(true);
     try {
-      if (configured) await saveSubjects(selected);
+      if (configured) {
+        await saveSubjects(selected);
+        if (user) await saveDailyGoal(user.uid, goal);
+        await refreshProfile();
+      }
       navigate("/dashboard");
     } finally {
       setSaving(false);
@@ -36,7 +49,7 @@ export default function Onboarding() {
     <div className="mx-auto max-w-4xl px-4 py-10 sm:px-6">
       <div className="mb-8 flex items-center justify-between">
         <Logo />
-        <span className="text-sm text-ink-400">Step 1 of 1</span>
+        <span className="text-sm text-ink-400">Quick setup · ~30 seconds</span>
       </div>
 
       <h1 className="font-display text-3xl font-bold text-white">
@@ -87,6 +100,34 @@ export default function Onboarding() {
             </button>
           );
         })}
+      </div>
+
+      <h2 className="mt-10 font-display text-xl font-bold text-white">
+        Set your daily goal
+      </h2>
+      <p className="mt-1 text-sm text-ink-400">
+        Questions + reviews per day. Small and consistent beats heroic and
+        occasional — you can change this anytime.
+      </p>
+      <div className="mt-4 grid gap-3 sm:grid-cols-3">
+        {GOALS.map((g) => (
+          <button
+            key={g.value}
+            onClick={() => setGoal(g.value)}
+            className={cn(
+              "rounded-2xl border p-4 text-left transition",
+              goal === g.value
+                ? "border-brand-500/50 bg-brand-500/10 ring-1 ring-inset ring-brand-500/30"
+                : "border-white/8 bg-ink-900/50 hover:border-white/20",
+            )}
+          >
+            <p className="font-display text-2xl font-bold text-white">
+              {g.value}
+            </p>
+            <p className="text-sm font-semibold text-brand-200">{g.label}</p>
+            <p className="mt-0.5 text-xs text-ink-400">{g.desc}</p>
+          </button>
+        ))}
       </div>
 
       <div className="sticky bottom-4 mt-8 flex items-center justify-between rounded-2xl border border-white/10 bg-ink-900/80 p-4 backdrop-blur">
