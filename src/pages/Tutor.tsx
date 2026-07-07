@@ -19,7 +19,13 @@ import { DEMO_SUBJECT_IDS, getSubject } from "@/data/subjects";
 import { useAuth } from "@/lib/auth";
 import { isPremium } from "@/lib/premium";
 import { tutorReply } from "@/lib/claude";
-import { awardXp, fetchRecentAttempts } from "@/lib/firestore";
+import {
+  awardXp,
+  createSession,
+  fetchLatestSessionForSubject,
+  fetchRecentAttempts,
+  saveSessionMessages,
+} from "@/lib/firestore";
 import { weakestTopics, type TopicMastery } from "@/lib/mastery";
 import { useSpeechRecognition, useSpeechSynthesis } from "@/lib/speech";
 import { canUse, incrementUsage, remaining } from "@/lib/usage";
@@ -104,12 +110,57 @@ export default function Tutor() {
     profile?.subjects?.length ? profile.subjects : DEMO_SUBJECT_IDS;
 
   const [subjectId, setSubjectId] = useState<SubjectId | null>(null);
+  const [sessionId, setSessionId] = useState<string | null>(null);
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
+  const [resuming, setResuming] = useState(false);
   const [error, setError] = useState("");
   const [weak, setWeak] = useState<TopicMastery[]>([]);
   const [ttsOn, setTtsOn] = useState(false);
+
+  const greetingFor = (name: string): ChatMessage => ({
+    role: "assistant",
+    content: `G'day! I'm your ${name} tutor. Ask me anything, or tell me what you're stuck on and we'll work through it together. What's on your mind?`,
+  });
+
+  // Open a subject: resume its saved chat if one exists (so conversations
+  // survive refresh), otherwise start and persist a fresh session.
+  const pickSubject = async (id: SubjectId) => {
+    const s = getSubject(id);
+    setSubjectId(id);
+    setError("");
+    lastSpokenRef.current = -1;
+    if (!configured || !user) {
+      // Demo mode — local only, no persistence.
+      setSessionId(null);
+      setMessages([greetingFor(s.name)]);
+      return;
+    }
+    setResuming(true);
+    setMessages([]);
+    try {
+      const existing = await fetchLatestSessionForSubject(user.uid, id);
+      if (existing && existing.messages?.length) {
+        setSessionId(existing.id);
+        setMessages(existing.messages);
+        // Don't re-read the whole backlog aloud if TTS is on.
+        lastSpokenRef.current = existing.messages.length - 1;
+      } else {
+        const greeting = [greetingFor(s.name)];
+        const newId = await createSession(user.uid, id, s.name);
+        setSessionId(newId);
+        setMessages(greeting);
+        void saveSessionMessages(user.uid, newId, greeting);
+      }
+    } catch (err) {
+      console.error("Failed to open tutor session", err);
+      setSessionId(null);
+      setMessages([greetingFor(s.name)]);
+    } finally {
+      setResuming(false);
+    }
+  };
   const scrollRef = useRef<HTMLDivElement>(null);
   // Index of the last assistant message we've already read aloud, so toggling
   // TTS on doesn't replay old messages and each new reply is spoken once.
@@ -173,7 +224,15 @@ export default function Tutor() {
       // Only count a successful exchange against the daily free allowance — a
       // failed request (e.g. network drop) shouldn't burn a message.
       if (!premium) incrementUsage(uid, "tutor");
-      setMessages([...nextMessages, { role: "assistant", content: reply }]);
+      const finalMessages: ChatMessage[] = [
+        ...nextMessages,
+        { role: "assistant", content: reply },
+      ];
+      setMessages(finalMessages);
+      // Persist the exchange so the conversation survives a refresh.
+      if (user && sessionId) {
+        void saveSessionMessages(user.uid, sessionId, finalMessages);
+      }
       if (user) void awardXp(user.uid, "tutorMessage", "tutorMessages");
     } catch (err) {
       setMessages([
@@ -260,15 +319,7 @@ export default function Tutor() {
             return (
               <button
                 key={id}
-                onClick={() => {
-                  setSubjectId(id);
-                  setMessages([
-                    {
-                      role: "assistant",
-                      content: `G'day! I'm your ${s.name} tutor. Ask me anything, or tell me what you're stuck on and we'll work through it together. What's on your mind?`,
-                    },
-                  ]);
-                }}
+                onClick={() => void pickSubject(id)}
                 className="card flex items-center gap-3 p-4 text-left transition hover:border-white/15"
               >
                 <div
@@ -352,6 +403,7 @@ export default function Tutor() {
               synth.cancel();
               lastSpokenRef.current = -1;
               setSubjectId(null);
+              setSessionId(null);
               setMessages([]);
               setError("");
             }}
@@ -370,7 +422,7 @@ export default function Tutor() {
         {messages.map((m, i) => (
           <Bubble key={i} msg={m} />
         ))}
-        {loading && (
+        {(loading || resuming) && (
           <div className="flex gap-3">
             <div className="grid h-8 w-8 place-items-center rounded-lg bg-ink-800">
               <LogoMark size={20} />

@@ -8,6 +8,7 @@ import {
   readBody,
   textOf,
 } from "./_lib.js";
+import { enforceUsage } from "./_usage.js";
 
 interface Body {
   subjectName: string;
@@ -57,6 +58,8 @@ export default async function handler(
       res.status(400).json({ error: "Please provide a longer response to mark." });
       return;
     }
+
+    if (!(await enforceUsage(req, res, "essay"))) return;
 
     const band = maxBand && maxBand > 0 ? maxBand : 6;
     const level = stage || "Year 12 (Stage 6 HSC)";

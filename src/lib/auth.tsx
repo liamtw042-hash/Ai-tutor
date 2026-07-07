@@ -10,6 +10,8 @@ import {
   createUserWithEmailAndPassword,
   signInWithEmailAndPassword,
   signInWithPopup,
+  signInWithRedirect,
+  getRedirectResult,
   signOut as fbSignOut,
   onAuthStateChanged,
   updateProfile,
@@ -33,6 +35,7 @@ import {
   setPremium as persistPremium,
   touchStreak,
 } from "@/lib/firestore";
+import { friendlyAuthError } from "@/lib/errors";
 import type { SubjectId, UserProfile, YearLevel } from "@/types";
 
 /** Fields a student can change from Settings after onboarding. */
@@ -51,6 +54,10 @@ interface AuthContextValue {
   profile: UserProfile | null;
   loading: boolean;
   configured: boolean;
+  /** Error surfaced from a completed Google *redirect* sign-in (e.g. the domain
+   *  isn't authorised). Popup errors are thrown from signInWithGoogle instead. */
+  authError: string | null;
+  clearAuthError: () => void;
   signUp: (email: string, password: string, name: string) => Promise<void>;
   signIn: (email: string, password: string) => Promise<void>;
   signInWithGoogle: () => Promise<void>;
@@ -67,6 +74,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [profile, setProfile] = useState<UserProfile | null>(null);
   const [loading, setLoading] = useState(true);
+  const [authError, setAuthError] = useState<string | null>(null);
+
+  const clearAuthError = useCallback(() => setAuthError(null), []);
 
   const loadProfile = useCallback(async (u: User) => {
     let p = await fetchProfile(u.uid);
@@ -83,6 +93,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       setLoading(false);
       return;
     }
+    // Surface any error from a completed Google *redirect* sign-in. On success
+    // onAuthStateChanged handles the user; here we only care about failures
+    // (e.g. auth/unauthorized-domain) so they never fail silently.
+    getRedirectResult(auth).catch((err) => {
+      console.error("Google redirect sign-in failed", err);
+      setAuthError(friendlyAuthError(err));
+    });
     const unsub = onAuthStateChanged(auth, async (u) => {
       setUser(u);
       if (u) {
@@ -117,7 +134,29 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, []);
 
   const signInWithGoogle = useCallback(async () => {
-    await signInWithPopup(requireAuth(), googleProvider);
+    const a = requireAuth();
+    setAuthError(null);
+    try {
+      await signInWithPopup(a, googleProvider);
+    } catch (err) {
+      const code =
+        err && typeof err === "object" && "code" in err
+          ? String((err as { code: string }).code)
+          : "";
+      // Popups are frequently blocked or unsupported (in-app browsers, strict
+      // privacy settings). Fall back to a full-page redirect in those cases so
+      // sign-in still completes instead of silently doing nothing.
+      if (
+        code === "auth/popup-blocked" ||
+        code === "auth/cancelled-popup-request" ||
+        code === "auth/operation-not-supported-in-environment"
+      ) {
+        await signInWithRedirect(a, googleProvider);
+        return; // browser navigates away; result handled on return
+      }
+      // Anything else (including deliberate popup close) is surfaced to the UI.
+      throw err;
+    }
   }, []);
 
   const signOut = useCallback(async () => {
@@ -191,6 +230,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         profile,
         loading,
         configured: firebaseConfigured,
+        authError,
+        clearAuthError,
         signUp,
         signIn,
         signInWithGoogle,

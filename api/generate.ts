@@ -8,6 +8,7 @@ import {
   readBody,
   textOf,
 } from "./_lib.js";
+import { enforceUsage } from "./_usage.js";
 
 // POST /api/generate — produce fresh HSC-style practice questions on demand.
 
@@ -45,6 +46,9 @@ export default async function handler(
       res.status(400).json({ error: "subjectName and topic are required" });
       return;
     }
+
+    if (!(await enforceUsage(req, res, "generate"))) return;
+
     const n = Math.max(1, Math.min(5, Math.round(count || 3)));
     const level = stage || "Year 12 (Stage 6 HSC)";
 

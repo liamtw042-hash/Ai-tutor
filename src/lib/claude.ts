@@ -1,3 +1,4 @@
+import { auth } from "@/lib/firebase";
 import type {
   ChatMessage,
   EssayFeedback,
@@ -16,10 +17,26 @@ import type {
 // unavailable, so callers should handle the thrown error gracefully.
 // ---------------------------------------------------------------------------
 
+/**
+ * The signed-in user's Firebase ID token, so the serverless functions can
+ * identify the caller and enforce free-tier limits server-side (not just in
+ * localStorage). Returns no header when signed out or in demo mode.
+ */
+async function authHeader(): Promise<Record<string, string>> {
+  try {
+    const user = auth?.currentUser;
+    if (!user) return {};
+    const token = await user.getIdToken();
+    return { Authorization: `Bearer ${token}` };
+  } catch {
+    return {};
+  }
+}
+
 async function postJSON<T>(url: string, body: unknown): Promise<T> {
   const res = await fetch(url, {
     method: "POST",
-    headers: { "Content-Type": "application/json" },
+    headers: { "Content-Type": "application/json", ...(await authHeader()) },
     body: JSON.stringify(body),
   });
   if (!res.ok) {
@@ -29,6 +46,8 @@ async function postJSON<T>(url: string, body: unknown): Promise<T> {
     } catch {
       /* ignore */
     }
+    // 429 (daily limit) and 401/403 (auth/premium) already carry a clear,
+    // user-facing message from the server — surface it as-is.
     throw new Error(
       detail || `Request failed (${res.status}). Is the API deployed?`,
     );

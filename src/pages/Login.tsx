@@ -1,4 +1,4 @@
-import { useState, type FormEvent } from "react";
+import { useEffect, useState, type FormEvent } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { AuthLayout } from "@/components/AuthLayout";
 import { Button } from "@/components/ui";
@@ -7,12 +7,18 @@ import { useAuth } from "@/lib/auth";
 import { friendlyAuthError } from "@/lib/errors";
 
 export default function Login() {
-  const { signIn, signInWithGoogle, configured } = useAuth();
+  const { user, signIn, signInWithGoogle, configured, authError } = useAuth();
   const navigate = useNavigate();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+
+  // If already signed in — including returning from a Google redirect — leave
+  // the auth pages. ProtectedRoute forwards to onboarding when it's needed.
+  useEffect(() => {
+    if (user) navigate("/dashboard", { replace: true });
+  }, [user, navigate]);
 
   const submit = async (e: FormEvent) => {
     e.preventDefault();
@@ -33,6 +39,8 @@ export default function Login() {
     setLoading(true);
     try {
       await signInWithGoogle();
+      // On success the popup path resolves and the effect above navigates. The
+      // redirect path navigates the whole page away, so we won't reach here.
       navigate("/dashboard");
     } catch (err) {
       setError(friendlyAuthError(err));
@@ -40,6 +48,8 @@ export default function Login() {
       setLoading(false);
     }
   };
+
+  const shownError = error || authError || "";
 
   return (
     <AuthLayout
@@ -97,9 +107,9 @@ export default function Login() {
             onChange={(e) => setPassword(e.target.value)}
           />
         </div>
-        {error && (
+        {shownError && (
           <p className="rounded-lg border border-red-500/20 bg-red-500/10 px-3 py-2 text-sm text-red-300">
-            {error}
+            {shownError}
           </p>
         )}
         <Button

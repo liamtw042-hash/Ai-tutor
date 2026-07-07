@@ -8,6 +8,7 @@ import {
   readBody,
   textOf,
 } from "./_lib.js";
+import { enforceUsage } from "./_usage.js";
 
 // POST /api/flashcards — generate a flashcard deck for a subject/topic.
 
@@ -34,6 +35,9 @@ export default async function handler(
       res.status(400).json({ error: "subjectName and topic are required" });
       return;
     }
+
+    if (!(await enforceUsage(req, res, "aiDeck"))) return;
+
     const n = Math.max(5, Math.min(20, Math.round(count || 12)));
     const level = stage || "Year 12 (Stage 6 HSC)";
 

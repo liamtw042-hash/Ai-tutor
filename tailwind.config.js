@@ -25,7 +25,9 @@ export default {
           800: "#1a1a28",
           700: "#242438",
           600: "#33334d",
-          500: "#4a4a68",
+          // 500 is used only for muted text; lifted from #4a4a68 (~2.2:1 on the
+          // dark canvas, below the readable floor) to ~3.3:1 while staying secondary.
+          500: "#626282",
           400: "#6c6c8a",
           300: "#9494b0",
           200: "#c4c4d6",

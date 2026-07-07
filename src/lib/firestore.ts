@@ -664,6 +664,19 @@ export async function saveSessionMessages(
   });
 }
 
+/**
+ * Most recent session for a subject, or null. Uses the index-free recent-list
+ * query and filters client-side so it never needs a composite Firestore index
+ * (which the subject-filtered query below would require).
+ */
+export async function fetchLatestSessionForSubject(
+  uid: string,
+  subjectId: SubjectId,
+): Promise<TutorSession | null> {
+  const recent = await fetchSessions(uid);
+  return recent.find((s) => s.subjectId === subjectId) ?? null;
+}
+
 export async function fetchSessions(
   uid: string,
   subjectId?: SubjectId,

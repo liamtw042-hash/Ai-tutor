@@ -7,9 +7,18 @@ const MESSAGES: Record<string, string> = {
   "auth/invalid-credential": "Incorrect email or password.",
   "auth/email-already-in-use": "An account with that email already exists.",
   "auth/weak-password": "Please choose a password with at least 6 characters.",
-  "auth/popup-closed-by-user": "Sign-in was cancelled.",
+  "auth/popup-closed-by-user": "Sign-in was cancelled — the Google window was closed before finishing.",
+  "auth/cancelled-popup-request": "Sign-in was cancelled.",
+  "auth/popup-blocked":
+    "Your browser blocked the Google sign-in popup. Allow popups for this site, or we'll redirect you instead.",
   "auth/too-many-requests": "Too many attempts. Please try again shortly.",
   "auth/network-request-failed": "Network error. Check your connection.",
+  "auth/operation-not-allowed":
+    "Google sign-in isn't enabled for this app yet. If you're the owner, enable Google in Firebase Authentication → Sign-in method.",
+  "auth/unauthorized-domain":
+    "This site's domain isn't authorised for Google sign-in. If you're the owner, add it under Firebase Authentication → Settings → Authorised domains.",
+  "auth/account-exists-with-different-credential":
+    "You already have an account with this email using a different sign-in method. Try logging in with that instead.",
 };
 
 export function friendlyAuthError(err: unknown): string {

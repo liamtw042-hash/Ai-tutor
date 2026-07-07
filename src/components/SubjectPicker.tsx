@@ -76,7 +76,7 @@ export function SubjectPicker({
               <h3 className="mb-2.5 text-xs font-semibold uppercase tracking-[0.14em] text-ink-500">
                 {g.area}
               </h3>
-              <div className="grid gap-2.5 sm:grid-cols-2">
+              <div className="grid grid-cols-1 gap-2.5 sm:grid-cols-2">
                 {g.subjects.map((s) => {
                   const active = selected.includes(s.id);
                   const allowed = allowedLevels(s, baseYear);

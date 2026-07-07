@@ -39,6 +39,9 @@ export const auth = authInstance;
 export const db = dbInstance;
 export const storage = storageInstance;
 export const googleProvider = new GoogleAuthProvider();
+// Always show the account chooser rather than silently reusing a session — and
+// keep the popup/redirect flow predictable across browsers.
+googleProvider.setCustomParameters({ prompt: "select_account" });
 
 /** Non-null accessors — call only after guarding on `firebaseConfigured`. */
 export function requireAuth(): Auth {

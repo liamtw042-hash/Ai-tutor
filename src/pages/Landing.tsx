@@ -403,7 +403,7 @@ export default function Landing() {
               Years 10–12. Not affiliated with NESA.
             </p>
           </div>
-          <p className="max-w-3xl text-xs leading-relaxed text-ink-600">
+          <p className="max-w-3xl text-xs leading-relaxed text-ink-400">
             {DISCLAIMERS.general}
           </p>
         </div>

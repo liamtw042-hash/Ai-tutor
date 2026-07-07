@@ -8,6 +8,7 @@ import {
   readBody,
   textOf,
 } from "./_lib.js";
+import { enforceUsage } from "./_usage.js";
 
 interface Body {
   subjectName: string;
@@ -43,6 +44,10 @@ export default async function handler(
       res.status(400).json({ error: "answer is required" });
       return;
     }
+
+    // Written practice marking counts against the daily practice allowance.
+    if (!(await enforceUsage(req, res, "practice"))) return;
+
     const level = stage || "Year 12 (Stage 6 HSC)";
 
     const criteria = question.markingCriteria?.length

@@ -7,6 +7,7 @@ import {
   readBody,
   textOf,
 } from "./_lib.js";
+import { enforceUsage } from "./_usage.js";
 
 interface ChatMessage {
   role: "user" | "assistant";
@@ -77,6 +78,9 @@ export default async function handler(
       res.status(400).json({ error: "messages are required" });
       return;
     }
+
+    // Server-side free-tier gate (premium/owner bypass inside).
+    if (!(await enforceUsage(req, res, "tutor"))) return;
 
     const message = await anthropic().messages.create({
       model: MODEL,

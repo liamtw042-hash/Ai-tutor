@@ -45,6 +45,13 @@ service cloud.firestore {
       match /uploads/{id} {
         allow read, write: if isOwner(uid);
       }
+      // Daily free-tier usage counters. Written only by the Admin SDK in the
+      // serverless functions (which bypasses rules); the client may read its
+      // own counters but never write them, so limits can't be reset client-side.
+      match /usage/{day} {
+        allow read: if isOwner(uid);
+        allow write: if false;
+      }
     }
 
     // Opt-in leaderboard: any signed-in user can read; each user may only
