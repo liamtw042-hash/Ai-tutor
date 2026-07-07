@@ -144,7 +144,7 @@ export default function ProgressPage() {
   }
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-8">
       <div>
         <h1 className="font-display text-3xl font-bold text-white">Progress</h1>
         <p className="mt-1 text-ink-300">

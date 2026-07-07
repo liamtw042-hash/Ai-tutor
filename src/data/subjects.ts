@@ -1,4 +1,11 @@
-import type { Subject, SubjectArea, SubjectId, Verification, YearLevel } from "@/types";
+import {
+  nextYearLevel,
+  type Subject,
+  type SubjectArea,
+  type SubjectId,
+  type Verification,
+  type YearLevel,
+} from "@/types";
 
 // ---------------------------------------------------------------------------
 // NSW subject catalogue for Years 10–12, grouped by NESA Key Learning Area.
@@ -533,4 +540,45 @@ export function topicsForYear(id: SubjectId, year: YearLevel): string[] {
   const s = getSubject(id);
   const list = s.topicsByYear[year];
   return list && list.length > 0 ? list : s.topics;
+}
+
+// --------------------------- Accelerated study -----------------------------
+// A student has a base year level, but may study individual subjects one stage
+// above it (common in NSW — e.g. a Year 10 doing Business Studies at Stage 6).
+// A subject's allowed levels are those the subject offers within {base, base+1}.
+
+/** Levels a subject can be studied at for a given base year (base + one up). */
+export function allowedLevels(
+  subject: Subject,
+  baseYear: YearLevel,
+): YearLevel[] {
+  const up = nextYearLevel(baseYear);
+  const window: YearLevel[] = up ? [baseYear, up] : [baseYear];
+  return window.filter((y) => subject.years.includes(y));
+}
+
+/** Default level for a subject at a base year: base if offered, else the (accelerated) one up. */
+export function defaultLevelFor(
+  subject: Subject,
+  baseYear: YearLevel,
+): YearLevel {
+  const allowed = allowedLevels(subject, baseYear);
+  if (allowed.includes(baseYear)) return baseYear;
+  return allowed[0] ?? baseYear;
+}
+
+/** Subjects a student at this base year can pick (offered at base or one stage up). */
+export function selectableSubjectsForBaseYear(baseYear: YearLevel): Subject[] {
+  return SUBJECTS.filter((s) => allowedLevels(s, baseYear).length > 0);
+}
+
+/** Selectable subjects grouped by KLA in display order. */
+export function selectableSubjectsByArea(
+  baseYear: YearLevel,
+): { area: SubjectArea; subjects: Subject[] }[] {
+  const offered = selectableSubjectsForBaseYear(baseYear);
+  return SUBJECT_AREAS.map((area) => ({
+    area,
+    subjects: offered.filter((s) => s.area === area),
+  })).filter((g) => g.subjects.length > 0);
 }

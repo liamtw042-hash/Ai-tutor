@@ -50,6 +50,7 @@ function withProfileDefaults(p: Partial<UserProfile> & { uid: string }): UserPro
     displayName: "Student",
     yearLevel: "year12",
     subjects: [],
+    subjectLevels: {},
     premium: false,
     createdAt: Date.now(),
     streak: 0,
@@ -113,6 +114,13 @@ export async function saveDisplayName(
   displayName: string,
 ): Promise<void> {
   await updateDoc(doc(requireDb(), "users", uid), { displayName });
+}
+
+export async function saveSubjectLevels(
+  uid: string,
+  subjectLevels: Record<string, YearLevel>,
+): Promise<void> {
+  await updateDoc(doc(requireDb(), "users", uid), { subjectLevels });
 }
 
 export async function setPremium(uid: string, premium: boolean): Promise<void> {

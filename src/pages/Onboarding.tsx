@@ -2,11 +2,19 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Logo } from "@/components/Logo";
 import { Button, cn } from "@/components/ui";
-import { subjectsForYear } from "@/data/subjects";
+import {
+  defaultLevelFor,
+  getSubject,
+  selectableSubjectsForBaseYear,
+} from "@/data/subjects";
 import { SubjectPicker } from "@/components/SubjectPicker";
 import { DISCLAIMERS } from "@/data/nesa";
 import { useAuth } from "@/lib/auth";
-import { saveDailyGoal, saveYearLevel } from "@/lib/firestore";
+import {
+  saveDailyGoal,
+  saveSubjectLevels,
+  saveYearLevel,
+} from "@/lib/firestore";
 import { YEAR_LEVELS, type SubjectId, type YearLevel } from "@/types";
 
 const GOALS = [
@@ -20,27 +28,47 @@ export default function Onboarding() {
   const navigate = useNavigate();
   const [yearLevel, setYearLevel] = useState<YearLevel>("year12");
   const [selected, setSelected] = useState<SubjectId[]>([]);
+  const [levels, setLevels] = useState<Record<SubjectId, YearLevel>>({});
   const [goal, setGoal] = useState(20);
   const [saving, setSaving] = useState(false);
 
   useEffect(() => {
     if (profile?.yearLevel) setYearLevel(profile.yearLevel);
     if (profile?.subjects?.length) setSelected(profile.subjects);
+    if (profile?.subjectLevels) setLevels(profile.subjectLevels);
     if (profile?.dailyGoal) setGoal(profile.dailyGoal);
   }, [profile]);
 
 
   const chooseYear = (id: YearLevel) => {
     setYearLevel(id);
-    // Drop any selected subjects not offered at the new year level.
-    const allowed = new Set(subjectsForYear(id).map((s) => s.id));
+    // Keep only subjects selectable at the new base year, and reset each kept
+    // subject to its default level for that year.
+    const allowed = new Set(selectableSubjectsForBaseYear(id).map((s) => s.id));
     setSelected((prev) => prev.filter((s) => allowed.has(s)));
+    setLevels((prev) => {
+      const next: Record<SubjectId, YearLevel> = {};
+      for (const sid of Object.keys(prev)) {
+        if (allowed.has(sid)) next[sid] = defaultLevelFor(getSubject(sid), id);
+      }
+      return next;
+    });
   };
 
-  const toggle = (id: SubjectId) =>
+  const toggle = (id: SubjectId) => {
     setSelected((prev) =>
       prev.includes(id) ? prev.filter((s) => s !== id) : [...prev, id],
     );
+    setLevels((prev) => {
+      const next = { ...prev };
+      if (selected.includes(id)) delete next[id];
+      else next[id] = defaultLevelFor(getSubject(id), yearLevel);
+      return next;
+    });
+  };
+
+  const setLevel = (id: SubjectId, level: YearLevel) =>
+    setLevels((prev) => ({ ...prev, [id]: level }));
 
   const finish = async () => {
     setSaving(true);
@@ -48,6 +76,7 @@ export default function Onboarding() {
       if (configured) {
         if (user) await saveYearLevel(user.uid, yearLevel);
         await saveSubjects(selected);
+        if (user) await saveSubjectLevels(user.uid, levels);
         if (user) await saveDailyGoal(user.uid, goal);
         await refreshProfile();
       }
@@ -102,9 +131,11 @@ export default function Onboarding() {
 
       <div className="mt-8">
         <SubjectPicker
-          year={yearLevel}
+          baseYear={yearLevel}
           selected={selected}
+          levels={levels}
           onToggle={toggle}
+          onSetLevel={setLevel}
         />
       </div>
 

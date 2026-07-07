@@ -27,6 +27,7 @@ import {
   saveSubjects as persistSubjects,
   saveDailyGoal as persistDailyGoal,
   saveDisplayName as persistDisplayName,
+  saveSubjectLevels as persistSubjectLevels,
   saveYearLevel as persistYearLevel,
   setLeaderboardOptIn as persistLeaderboardOptIn,
   setPremium as persistPremium,
@@ -38,6 +39,7 @@ import type { SubjectId, UserProfile, YearLevel } from "@/types";
 export interface ProfileSettingsPatch {
   yearLevel?: YearLevel;
   subjects?: SubjectId[];
+  subjectLevels?: Record<SubjectId, YearLevel>;
   dailyGoal?: number;
   displayName?: string;
   leaderboardOptIn?: boolean;
@@ -143,6 +145,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       }
       if (patch.subjects !== undefined) {
         await persistSubjects(user.uid, patch.subjects);
+      }
+      if (patch.subjectLevels !== undefined) {
+        await persistSubjectLevels(user.uid, patch.subjectLevels);
       }
       if (patch.dailyGoal !== undefined) {
         await persistDailyGoal(user.uid, patch.dailyGoal);

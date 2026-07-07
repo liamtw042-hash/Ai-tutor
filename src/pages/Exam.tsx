@@ -30,12 +30,12 @@ import {
   XIcon,
 } from "@/components/icons";
 import {
-  stageLabel,
   type ExamQuestionResult,
   type ExamResult,
   type Question,
   type SubjectId,
 } from "@/types";
+import { stageForSubject } from "@/lib/level";
 
 type Phase = "setup" | "running" | "marking" | "results";
 
@@ -154,7 +154,7 @@ export default function Exam() {
               },
               subject.name,
               given,
-              stageLabel(profile?.yearLevel),
+              stageForSubject(profile, subjectId),
             );
             results.push({
               questionId: q.id,
@@ -460,7 +460,7 @@ export default function Exam() {
 
   // ---------- Setup ----------
   return (
-    <div className="space-y-6">
+    <div className="space-y-8">
       <div>
         <h1 className="font-display text-3xl font-bold text-white">Exam Mode</h1>
         <p className="mt-1 text-ink-300">

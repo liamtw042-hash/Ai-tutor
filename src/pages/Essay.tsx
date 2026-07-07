@@ -13,11 +13,11 @@ import {
 } from "@/lib/firestore";
 import { canUse, incrementUsage, remaining } from "@/lib/usage";
 import {
-  stageLabel,
   type EssayFeedback,
   type EssayRecord,
   type SubjectId,
 } from "@/types";
+import { stageForSubject } from "@/lib/level";
 
 const QUESTION_TYPES = [
   "Essay / extended response",
@@ -83,7 +83,7 @@ export default function Essay() {
         subject.bands,
         essay,
         question.trim() || undefined,
-        stageLabel(profile?.yearLevel),
+        stageForSubject(profile, subjectId),
       );
       setFb(result);
       if (!premium) incrementUsage(uid, "essay");
@@ -104,7 +104,7 @@ export default function Essay() {
   };
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-8">
       <div className="flex flex-col justify-between gap-3 sm:flex-row sm:items-center">
         <div>
           <h1 className="font-display text-3xl font-bold text-white">

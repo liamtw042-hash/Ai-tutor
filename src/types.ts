@@ -50,6 +50,13 @@ export function stageLabel(id: YearLevel | undefined | null): string {
   return `${m.label} (${m.stage})`;
 }
 
+/** The year level one stage above the given one (Year 12 has none). */
+export function nextYearLevel(id: YearLevel): YearLevel | null {
+  if (id === "year10") return "year11";
+  if (id === "year11") return "year12";
+  return null;
+}
+
 /**
  * A subject/course id. Now a free string rather than a fixed union so the app
  * can carry the full NESA course range across Years 10–12 (see data/subjects).
@@ -143,6 +150,12 @@ export interface UserProfile {
   /** NSW year level (Stage 5 / Preliminary / HSC). Defaults to year12. */
   yearLevel: YearLevel;
   subjects: SubjectId[];
+  /**
+   * Per-subject year level for accelerated study. Maps a subject id to the
+   * year/stage the student actually studies it at (which may be one stage above
+   * their base yearLevel). Absent → the subject uses the base year default.
+   */
+  subjectLevels: Record<SubjectId, YearLevel>;
   premium: boolean;
   createdAt: number;
   // streak tracking

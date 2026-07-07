@@ -35,13 +35,13 @@ import {
   XIcon,
 } from "@/components/icons";
 import {
-  stageLabel,
   type Deck,
   type Flashcard,
   type ReviewGrade,
   type SubjectId,
   type YearLevel,
 } from "@/types";
+import { levelForSubject, stageForSubject } from "@/lib/level";
 
 type StudyMode = "flip" | "write" | "match";
 
@@ -157,7 +157,7 @@ export default function Flashcards() {
 
   // ---------- Deck list ----------
   return (
-    <div className="space-y-6">
+    <div className="space-y-8">
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div>
           <h1 className="font-display text-3xl font-bold text-white">
@@ -230,8 +230,8 @@ export default function Flashcards() {
         uid={uid}
         premium={premium}
         subjects={profile?.subjects?.length ? profile.subjects : SUBJECTS.map((s) => s.id)}
-        year={profile?.yearLevel ?? "year12"}
-        stage={stageLabel(profile?.yearLevel)}
+        baseYear={profile?.yearLevel ?? "year12"}
+        levels={profile?.subjectLevels ?? {}}
         onCreated={onDeckCreated}
       />
     </div>
@@ -247,8 +247,8 @@ function CreateDeckModal({
   uid,
   premium,
   subjects,
-  year,
-  stage,
+  baseYear,
+  levels,
   onCreated,
 }: {
   open: boolean;
@@ -256,12 +256,16 @@ function CreateDeckModal({
   uid: string;
   premium: boolean;
   subjects: SubjectId[];
-  year: YearLevel;
-  stage: string;
+  baseYear: YearLevel;
+  levels: Record<SubjectId, YearLevel>;
   onCreated: (deckId: string) => Promise<void>;
 }) {
   const [tab, setTab] = useState<"ai" | "manual">("ai");
   const [subjectId, setSubjectId] = useState<SubjectId>(subjects[0]);
+  // Level for the chosen subject respects per-subject acceleration.
+  const levelProfile = { yearLevel: baseYear, subjectLevels: levels };
+  const year = levelForSubject(levelProfile, subjectId);
+  const stage = stageForSubject(levelProfile, subjectId);
   const [topic, setTopic] = useState("");
   const [name, setName] = useState("");
   const [count, setCount] = useState(12);

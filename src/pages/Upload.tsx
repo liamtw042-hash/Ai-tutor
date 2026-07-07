@@ -33,7 +33,8 @@ import {
   WandIcon,
   XIcon,
 } from "@/components/icons";
-import { stageLabel, type SubjectId, type Upload, type UploadAction } from "@/types";
+import { type SubjectId, type Upload, type UploadAction } from "@/types";
+import { stageForSubject } from "@/lib/level";
 
 const ACTIONS: {
   id: UploadAction;
@@ -92,7 +93,7 @@ export default function UploadPage() {
     };
   }, [previewUrl]);
 
-  const stage = stageLabel(profile?.yearLevel);
+  const stage = stageForSubject(profile, subjectId);
 
   const onPick = async (picked: File | null) => {
     if (!picked) return;

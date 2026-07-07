@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState, type ReactNode } from "react";
 import { Link } from "react-router-dom";
 import { useAuth } from "@/lib/auth";
 import {
@@ -27,7 +27,6 @@ import {
   FadeUp,
   Progress,
   ProgressRing,
-  Stat,
   cn,
 } from "@/components/ui";
 import {
@@ -129,7 +128,7 @@ export default function Dashboard() {
     .reverse();
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-10">
       {/* Header row */}
       <FadeUp>
         <div className="flex flex-wrap items-end justify-between gap-4">
@@ -163,7 +162,7 @@ export default function Dashboard() {
 
       {/* Goal ring + stats */}
       <FadeUp delay={0.05}>
-        <div className="grid gap-4 md:grid-cols-[auto_1fr]">
+        <div className="grid gap-5 md:grid-cols-[auto_1fr]">
           <Card className="flex items-center gap-5 md:min-w-[300px]">
             <ProgressRing
               value={goalPct}
@@ -191,39 +190,37 @@ export default function Dashboard() {
             </div>
           </Card>
 
-          <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
-            <Stat
-              label="Day streak"
+          <div className="grid grid-cols-2 items-center gap-x-6 gap-y-6 rounded-2xl border border-white/5 bg-white/[0.02] px-5 py-5 sm:grid-cols-4">
+            <StatItem
+              icon={<FlameIcon className="h-4 w-4" />}
               value={profile?.streak ?? 0}
+              label="Day streak"
               hint={`best ${profile?.bestStreak ?? profile?.streak ?? 0}`}
-              icon={<FlameIcon className="h-5 w-5" />}
             />
-            <Stat
-              label={`Level ${lp.level}`}
+            <StatItem
+              icon={<SparkIcon className="h-4 w-4" />}
               value={`${profile?.xp ?? 0} XP`}
+              label={`Level ${lp.level}`}
               hint={levelTitle(lp.level)}
-              icon={<SparkIcon className="h-5 w-5" />}
             />
-            <Stat
-              label="Questions answered"
+            <StatItem
+              icon={<PenIcon className="h-4 w-4" />}
               value={profile?.questionsAnswered ?? 0}
-              hint={
-                accuracy !== null ? `${Math.round(accuracy * 100)}% right` : undefined
-              }
-              icon={<PenIcon className="h-5 w-5" />}
+              label="Questions"
+              hint={accuracy !== null ? `${Math.round(accuracy * 100)}% right` : undefined}
             />
-            <Stat
-              label="In long-term memory"
+            <StatItem
+              icon={<BrainIcon className="h-4 w-4" />}
               value={srs?.learned ?? 0}
+              label="In memory"
               hint={srs ? `${srs.total} tracked` : undefined}
-              icon={<BrainIcon className="h-5 w-5" />}
             />
           </div>
         </div>
       </FadeUp>
 
       {/* Review queue + weak topics */}
-      <div className="grid gap-4 lg:grid-cols-2">
+      <div className="grid gap-5 lg:grid-cols-2">
         <FadeUp delay={0.1}>
           <Card className="h-full">
             <div className="flex items-center justify-between">
@@ -259,7 +256,7 @@ export default function Dashboard() {
         <FadeUp delay={0.15}>
           <Card className="h-full">
             <h2 className="flex items-center gap-2 font-semibold text-white">
-              <TargetIcon className="h-[18px] w-[18px] text-brand-300" />
+              <TargetIcon className="h-[18px] w-[18px] text-ink-500" />
               Focus areas
             </h2>
             {weak.length > 0 ? (
@@ -299,7 +296,7 @@ export default function Dashboard() {
         <Card>
           <div className="mb-4 flex items-center justify-between">
             <h2 className="flex items-center gap-2 font-semibold text-white">
-              <BoltIcon className="h-[18px] w-[18px] text-brand-300" />
+              <BoltIcon className="h-[18px] w-[18px] text-ink-500" />
               Study activity
             </h2>
             <span className="text-xs text-ink-400">
@@ -381,6 +378,35 @@ export default function Dashboard() {
           )}
         </div>
       </FadeUp>
+    </div>
+  );
+}
+
+function StatItem({
+  icon,
+  value,
+  label,
+  hint,
+}: {
+  icon: ReactNode;
+  value: ReactNode;
+  label: string;
+  hint?: string;
+}) {
+  return (
+    <div className="flex items-center gap-3">
+      <span className="grid h-9 w-9 shrink-0 place-items-center rounded-lg bg-white/5 text-ink-300">
+        {icon}
+      </span>
+      <div className="min-w-0">
+        <div className="text-lg font-semibold leading-tight text-white">
+          {value}
+        </div>
+        <div className="truncate text-[11px] text-ink-400">
+          {label}
+          {hint ? ` · ${hint}` : ""}
+        </div>
+      </div>
     </div>
   );
 }

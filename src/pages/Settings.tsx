@@ -1,6 +1,10 @@
 import { useEffect, useMemo, useState } from "react";
 import { useAuth } from "@/lib/auth";
-import { subjectsForYear, getSubject } from "@/data/subjects";
+import {
+  defaultLevelFor,
+  getSubject,
+  selectableSubjectsForBaseYear,
+} from "@/data/subjects";
 import { SubjectPicker } from "@/components/SubjectPicker";
 import {
   Badge,
@@ -28,6 +32,7 @@ export default function Settings() {
 
   const [yearLevel, setYearLevel] = useState<YearLevel>("year12");
   const [subjects, setSubjects] = useState<SubjectId[]>([]);
+  const [levels, setLevels] = useState<Record<SubjectId, YearLevel>>({});
   const [dailyGoal, setDailyGoal] = useState(20);
   const [displayName, setDisplayName] = useState("");
   const [leaderboardOptIn, setLeaderboardOptIn] = useState(false);
@@ -43,6 +48,7 @@ export default function Settings() {
     if (!profile) return;
     setYearLevel(profile.yearLevel);
     setSubjects(profile.subjects ?? []);
+    setLevels(profile.subjectLevels ?? {});
     setDailyGoal(profile.dailyGoal || 20);
     setDisplayName(profile.displayName ?? "");
     setLeaderboardOptIn(profile.leaderboardOptIn ?? false);
@@ -53,10 +59,17 @@ export default function Settings() {
   const chooseYear = (id: YearLevel) => {
     setSaved(false);
     setYearLevel(id);
-    const allowed = new Set(subjectsForYear(id).map((s) => s.id));
+    const allowed = new Set(selectableSubjectsForBaseYear(id).map((s) => s.id));
     const keep = subjects.filter((s) => allowed.has(s));
     const lost = subjects.filter((s) => !allowed.has(s));
     setSubjects(keep);
+    setLevels(() => {
+      const next: Record<SubjectId, YearLevel> = {};
+      for (const sid of keep) {
+        next[sid] = defaultLevelFor(getSubject(sid), id);
+      }
+      return next;
+    });
     setDropped(lost.map((s) => getSubject(s).name));
   };
 
@@ -65,6 +78,17 @@ export default function Settings() {
     setSubjects((prev) =>
       prev.includes(id) ? prev.filter((s) => s !== id) : [...prev, id],
     );
+    setLevels((prev) => {
+      const next = { ...prev };
+      if (subjects.includes(id)) delete next[id];
+      else next[id] = defaultLevelFor(getSubject(id), yearLevel);
+      return next;
+    });
+  };
+
+  const setLevel = (id: SubjectId, level: YearLevel) => {
+    setSaved(false);
+    setLevels((prev) => ({ ...prev, [id]: level }));
   };
 
   const dirty = useMemo(() => {
@@ -72,9 +96,14 @@ export default function Settings() {
     const sameSubjects =
       subjects.length === (profile.subjects?.length ?? 0) &&
       subjects.every((s) => profile.subjects?.includes(s));
+    const savedLevels = profile.subjectLevels ?? {};
+    const sameLevels =
+      subjects.every((s) => (levels[s] ?? null) === (savedLevels[s] ?? null)) &&
+      Object.keys(savedLevels).every((s) => subjects.includes(s));
     return (
       yearLevel !== profile.yearLevel ||
       !sameSubjects ||
+      !sameLevels ||
       dailyGoal !== (profile.dailyGoal || 20) ||
       displayName.trim() !== (profile.displayName ?? "") ||
       leaderboardOptIn !== (profile.leaderboardOptIn ?? false) ||
@@ -84,6 +113,7 @@ export default function Settings() {
     profile,
     yearLevel,
     subjects,
+    levels,
     dailyGoal,
     displayName,
     leaderboardOptIn,
@@ -111,6 +141,7 @@ export default function Settings() {
       await saveSettings({
         yearLevel,
         subjects,
+        subjectLevels: levels,
         dailyGoal,
         displayName: name,
         leaderboardOptIn,
@@ -140,7 +171,7 @@ export default function Settings() {
   const meta = yearLevelMeta(yearLevel);
 
   return (
-    <div className="mx-auto max-w-3xl space-y-6 pb-24">
+    <div className="mx-auto max-w-3xl space-y-8 pb-24">
       <div className="flex items-center gap-3">
         <div className="grid h-11 w-11 place-items-center rounded-2xl bg-brand-500/15 text-brand-300 ring-1 ring-inset ring-brand-500/25">
           <SettingsIcon className="h-6 w-6" />
@@ -194,7 +225,8 @@ export default function Settings() {
           <div>
             <h2 className="font-semibold text-white">Subjects</h2>
             <p className="mt-0.5 text-sm text-ink-400">
-              All subjects offered at {meta.label}. Add or remove any time.
+              Subjects for {meta.label}. Studying one ahead? Bump a subject up a
+              stage — it stays at that level everywhere.
             </p>
           </div>
           <Badge tone={subjects.length ? "brand" : "amber"}>
@@ -203,9 +235,11 @@ export default function Settings() {
         </div>
         <div className="mt-4">
           <SubjectPicker
-            year={yearLevel}
+            baseYear={yearLevel}
             selected={subjects}
+            levels={levels}
             onToggle={toggleSubject}
+            onSetLevel={setLevel}
           />
         </div>
       </Card>

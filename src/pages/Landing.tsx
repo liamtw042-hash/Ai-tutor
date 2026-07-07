@@ -218,7 +218,7 @@ export default function Landing() {
       </section>
 
       {/* Features */}
-      <section id="features" className="mx-auto max-w-6xl px-4 py-16 sm:px-6">
+      <section id="features" className="mx-auto max-w-6xl px-4 py-20 sm:px-6">
         <div className="mb-10 text-center">
           <div className="mb-2 text-xs font-semibold uppercase tracking-widest text-brand-300">
             Everything in one place
@@ -258,7 +258,7 @@ export default function Landing() {
       </section>
 
       {/* Pricing */}
-      <section id="pricing" className="mx-auto max-w-5xl px-4 py-16 sm:px-6">
+      <section id="pricing" className="mx-auto max-w-5xl px-4 py-20 sm:px-6">
         <div className="mb-10 text-center">
           <div className="mb-2 text-xs font-semibold uppercase tracking-widest text-brand-300">
             Pricing

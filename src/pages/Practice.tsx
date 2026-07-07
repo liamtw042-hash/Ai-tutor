@@ -22,13 +22,12 @@ import {
 import { generateQuestions, markWritten } from "@/lib/claude";
 import { canUse, incrementUsage, remaining } from "@/lib/usage";
 import {
-  stageLabel,
   type GeneratedQuestion,
   type Question,
   type SubjectId,
   type WrittenFeedback,
-  type YearLevel,
 } from "@/types";
+import { levelForSubject, stageForSubject } from "@/lib/level";
 
 const TYPE_LABEL: Record<string, string> = {
   "multiple-choice": "Multiple choice",
@@ -346,8 +345,6 @@ export default function Practice() {
   const [params, setParams] = useSearchParams();
   const premium = isPremium(profile);
   const uid = profile?.uid ?? "demo";
-  const year: YearLevel = profile?.yearLevel ?? "year12";
-  const stage = stageLabel(profile?.yearLevel);
 
   const availableSubjects: SubjectId[] =
     profile?.subjects?.length ? profile.subjects : SUBJECTS.map((s) => s.id);
@@ -359,6 +356,9 @@ export default function Practice() {
       : availableSubjects[0];
 
   const [subjectId, setSubjectId] = useState<SubjectId>(initialSubject);
+  // Level respects per-subject acceleration (may be above the base year).
+  const year = levelForSubject(profile, subjectId);
+  const stage = stageForSubject(profile, subjectId);
   const [topic, setTopic] = useState<string>(params.get("topic") || "All topics");
   const [index, setIndex] = useState(0);
   const [selected, setSelected] = useState<number | null>(null);
@@ -450,7 +450,7 @@ export default function Practice() {
   const next = () => resetQuestion((index + 1) % questions.length);
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-8">
       <div className="flex flex-col justify-between gap-3 sm:flex-row sm:items-center">
         <div>
           <h1 className="font-display text-3xl font-bold text-white">Practice</h1>
