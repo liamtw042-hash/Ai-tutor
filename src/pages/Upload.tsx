@@ -190,11 +190,11 @@ export default function UploadPage() {
   if (!premium) {
     return (
       <div className="mx-auto max-w-xl">
-        <Card className="p-8 text-center">
+        <Card className="p-6 text-center">
           <div className="mx-auto mb-4 grid h-14 w-14 place-items-center rounded-2xl bg-brand-500/15 text-brand-300">
             <LockIcon className="h-7 w-7" />
           </div>
-          <h1 className="font-display text-2xl font-bold text-white">
+          <h1 className="page-title">
             Photo &amp; document help is Premium
           </h1>
           <p className="mt-3 text-sm leading-relaxed text-ink-300">
@@ -217,10 +217,10 @@ export default function UploadPage() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="font-display text-3xl font-bold text-white">
+        <h1 className="page-title">
           Upload your work
         </h1>
-        <p className="mt-1 text-ink-300">
+        <p className="page-subtitle">
           Photograph handwritten work or upload a worksheet/PDF. StudyMate reads
           it — even messy handwriting — and helps you with it.
         </p>
@@ -251,9 +251,9 @@ export default function UploadPage() {
               <div className="flex flex-col gap-3 sm:flex-row">
                 <button
                   onClick={() => cameraRef.current?.click()}
-                  className="flex flex-1 flex-col items-center gap-2 rounded-2xl border border-dashed border-white/15 p-6 text-center transition hover:border-brand-500/40 hover:bg-brand-500/5"
+                  className="flex flex-1 flex-col items-center gap-2 rounded-2xl border border-dashed border-white/15 p-6 text-center transition hover:border-white/15 hover:bg-white/5"
                 >
-                  <CameraIcon className="h-7 w-7 text-brand-300" />
+                  <CameraIcon className="h-7 w-7 text-ink-400" />
                   <span className="text-sm font-semibold text-white">
                     Take a photo
                   </span>
@@ -263,9 +263,9 @@ export default function UploadPage() {
                 </button>
                 <button
                   onClick={() => fileRef.current?.click()}
-                  className="flex flex-1 flex-col items-center gap-2 rounded-2xl border border-dashed border-white/15 p-6 text-center transition hover:border-brand-500/40 hover:bg-brand-500/5"
+                  className="flex flex-1 flex-col items-center gap-2 rounded-2xl border border-dashed border-white/15 p-6 text-center transition hover:border-white/15 hover:bg-white/5"
                 >
-                  <UploadIcon className="h-7 w-7 text-brand-300" />
+                  <UploadIcon className="h-7 w-7 text-ink-400" />
                   <span className="text-sm font-semibold text-white">
                     Choose a file
                   </span>
@@ -287,7 +287,7 @@ export default function UploadPage() {
                       className="h-full w-full object-cover"
                     />
                   ) : (
-                    <FileIcon className="h-8 w-8 text-brand-300" />
+                    <FileIcon className="h-8 w-8 text-ink-400" />
                   )}
                 </div>
                 <div className="min-w-0 flex-1">
@@ -362,10 +362,10 @@ export default function UploadPage() {
                     "flex items-start gap-3 rounded-xl border p-3.5 text-left transition disabled:cursor-not-allowed disabled:opacity-40",
                     action === a.id && (analyzing || result)
                       ? "border-brand-500/50 bg-brand-500/10"
-                      : "border-white/10 bg-white/[0.02] hover:border-brand-500/40",
+                      : "border-white/10 bg-white/[0.02] hover:border-white/15",
                   )}
                 >
-                  <span className="mt-0.5 grid h-8 w-8 shrink-0 place-items-center rounded-lg bg-brand-500/12 text-brand-300">
+                  <span className="mt-0.5 grid h-8 w-8 shrink-0 place-items-center rounded-lg bg-white/5 text-ink-300">
                     <Icon className="h-4 w-4" />
                   </span>
                   <span className="min-w-0">
@@ -454,7 +454,7 @@ export default function UploadPage() {
                     href={u.url}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="truncate text-sm font-medium text-ink-100 hover:text-brand-200"
+                    className="truncate text-sm font-medium text-ink-100 hover:text-white"
                   >
                     {u.name}
                   </a>

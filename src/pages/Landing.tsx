@@ -186,10 +186,10 @@ export default function Landing() {
       <section id="method" className="border-y border-white/5 bg-ink-900/30">
         <div className="mx-auto max-w-6xl px-4 py-16 sm:px-6">
           <div className="mb-10 text-center">
-            <div className="mb-2 text-xs font-semibold uppercase tracking-widest text-brand-300">
+            <div className="mb-2 text-xs font-semibold uppercase tracking-widest text-ink-500">
               The science, not the vibes
             </div>
-            <h2 className="font-display text-3xl font-bold text-white sm:text-4xl">
+            <h2 className="font-display text-3xl font-semibold tracking-tight text-white sm:text-4xl">
               Built on the loop that makes studying stick
             </h2>
             <p className="mx-auto mt-3 max-w-2xl text-ink-300">
@@ -220,10 +220,10 @@ export default function Landing() {
       {/* Features */}
       <section id="features" className="mx-auto max-w-6xl px-4 py-20 sm:px-6">
         <div className="mb-10 text-center">
-          <div className="mb-2 text-xs font-semibold uppercase tracking-widest text-brand-300">
+          <div className="mb-2 text-xs font-semibold uppercase tracking-widest text-ink-500">
             Everything in one place
           </div>
-          <h2 className="font-display text-3xl font-bold text-white sm:text-4xl">
+          <h2 className="font-display text-3xl font-semibold tracking-tight text-white sm:text-4xl">
             Eight tools that move your marks
           </h2>
         </div>
@@ -231,7 +231,7 @@ export default function Landing() {
           {FEATURES.map(({ icon: Icon, title, body }) => (
             <div
               key={title}
-              className="card group p-6 transition hover:border-brand-500/30"
+              className="card group p-6 transition hover:border-white/15"
             >
               <div className="mb-4 grid h-11 w-11 place-items-center rounded-xl bg-brand-500/15 text-brand-300 ring-1 ring-inset ring-brand-500/25">
                 <Icon className="h-5 w-5" />
@@ -260,10 +260,10 @@ export default function Landing() {
       {/* Pricing */}
       <section id="pricing" className="mx-auto max-w-5xl px-4 py-20 sm:px-6">
         <div className="mb-10 text-center">
-          <div className="mb-2 text-xs font-semibold uppercase tracking-widest text-brand-300">
+          <div className="mb-2 text-xs font-semibold uppercase tracking-widest text-ink-500">
             Pricing
           </div>
-          <h2 className="font-display text-3xl font-bold text-white sm:text-4xl">
+          <h2 className="font-display text-3xl font-semibold tracking-tight text-white sm:text-4xl">
             Start free. Upgrade when you're serious.
           </h2>
           <p className="mx-auto mt-3 max-w-xl text-ink-300">
@@ -273,7 +273,7 @@ export default function Landing() {
         </div>
         <div className="grid items-start gap-5 md:grid-cols-2">
           {/* Free */}
-          <div className="card p-7">
+          <div className="card p-6">
             <h3 className="text-lg font-semibold text-white">Free</h3>
             <p className="mt-1 text-sm text-ink-400">
               The full study loop, every day.
@@ -303,7 +303,7 @@ export default function Landing() {
           </div>
 
           {/* Premium */}
-          <div className="card relative overflow-hidden border-brand-500/40 p-7 shadow-glow">
+          <div className="card relative overflow-hidden border-brand-500/40 p-6">
             <div className="absolute right-5 top-5">
               <Badge tone="brand">
                 <BoltIcon className="h-3.5 w-3.5" /> Serious mode
@@ -345,7 +345,7 @@ export default function Landing() {
       {/* CTA */}
       <section className="mx-auto max-w-6xl px-4 pb-20 sm:px-6">
         <div className="relative overflow-hidden rounded-3xl border border-brand-500/20 bg-gradient-to-br from-brand-600/20 via-ink-900 to-ink-900 p-10 text-center sm:p-14">
-          <h2 className="font-display text-3xl font-bold text-white sm:text-4xl">
+          <h2 className="font-display text-3xl font-semibold tracking-tight text-white sm:text-4xl">
             Your exams won't study for themselves.
           </h2>
           <p className="mx-auto mt-3 max-w-xl text-ink-300">
@@ -379,7 +379,7 @@ export default function Landing() {
                 href={l.url}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="rounded-xl border border-white/5 bg-white/[0.02] p-4 transition hover:border-brand-500/30 hover:bg-brand-500/5"
+                className="rounded-xl border border-white/5 bg-white/[0.02] p-4 transition hover:border-white/15 hover:bg-white/5"
               >
                 <p className="text-sm font-semibold text-brand-200">
                   {l.label}

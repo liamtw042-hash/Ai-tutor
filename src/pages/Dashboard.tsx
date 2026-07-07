@@ -133,7 +133,7 @@ export default function Dashboard() {
       <FadeUp>
         <div className="flex flex-wrap items-end justify-between gap-4">
           <div>
-            <h1 className="font-display text-2xl font-bold text-white sm:text-3xl">
+            <h1 className="page-title">
               {greeting()}, {firstName}
             </h1>
             <p className="mt-1 text-sm text-ink-400">
@@ -182,7 +182,7 @@ export default function Dashboard() {
               </p>
               <Link
                 to={srs && srs.dueToday > 0 ? "/review" : "/practice"}
-                className="mt-2.5 inline-flex items-center gap-1 text-xs font-semibold text-brand-300 hover:text-brand-200"
+                className="mt-2.5 inline-flex items-center gap-1 text-xs font-semibold text-ink-300 hover:text-white"
               >
                 {srs && srs.dueToday > 0 ? "Clear reviews" : "Practise now"}
                 <ArrowRightIcon className="h-3.5 w-3.5" />
@@ -225,7 +225,7 @@ export default function Dashboard() {
           <Card className="h-full">
             <div className="flex items-center justify-between">
               <h2 className="flex items-center gap-2 font-semibold text-white">
-                <BrainIcon className="h-[18px] w-[18px] text-brand-300" />
+                <BrainIcon className="h-[18px] w-[18px] text-ink-500" />
                 Today's review
               </h2>
               {srs && srs.dueToday > 0 && (
@@ -265,7 +265,7 @@ export default function Dashboard() {
                   <Link
                     key={`${t.subjectId}-${t.topic}`}
                     to={`/practice?subject=${t.subjectId}&topic=${encodeURIComponent(t.topic)}`}
-                    className="flex items-center gap-3 rounded-xl border border-white/5 bg-white/[0.03] p-3 transition hover:border-brand-500/30 hover:bg-brand-500/5"
+                    className="flex items-center gap-3 rounded-xl border border-white/5 bg-white/[0.03] p-3 transition hover:border-white/15 hover:bg-white/5"
                   >
                     <span className="text-lg">{getSubject(t.subjectId).icon}</span>
                     <div className="min-w-0 flex-1">
@@ -315,7 +315,7 @@ export default function Dashboard() {
             <h2 className="font-semibold text-white">Your subjects</h2>
             <Link
               to="/progress"
-              className="text-xs font-semibold text-brand-300 hover:text-brand-200"
+              className="text-xs font-semibold text-ink-300 hover:text-white"
             >
               Full analytics →
             </Link>
@@ -332,7 +332,7 @@ export default function Dashboard() {
                   <Link
                     key={m.subjectId}
                     to={`/practice?subject=${m.subjectId}`}
-                    className="card group p-5 transition hover:border-brand-500/30"
+                    className="card group p-6 transition hover:border-white/15"
                   >
                     <div className="flex items-start justify-between">
                       <span
@@ -356,7 +356,7 @@ export default function Dashboard() {
                         {m.attempts > 0 ? `${Math.round(m.mastery * 100)}%` : "—"}
                       </span>
                     </div>
-                    <p className="mt-3 font-semibold text-white group-hover:text-brand-200">
+                    <p className="mt-3 font-semibold text-white group-hover:text-white">
                       {subject.name}
                     </p>
                     <p className="mt-0.5 text-xs text-ink-400">

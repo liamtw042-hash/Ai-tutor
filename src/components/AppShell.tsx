@@ -112,7 +112,7 @@ function StreakXpStrip({ compact }: { compact?: boolean }) {
         className={cn(
           "inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-xs font-bold ring-1 ring-inset",
           (profile.streak ?? 0) > 0
-            ? "bg-amber-500/12 text-amber-300 ring-amber-500/25"
+            ? "bg-white/5 text-amber-300/90 ring-white/10"
             : "bg-white/5 text-ink-400 ring-white/10",
         )}
         title={`${profile.streak} day streak`}
@@ -121,7 +121,7 @@ function StreakXpStrip({ compact }: { compact?: boolean }) {
         {profile.streak ?? 0}
       </span>
       <span
-        className="inline-flex items-center gap-1 rounded-full bg-brand-500/12 px-2.5 py-1 text-xs font-bold text-brand-200 ring-1 ring-inset ring-brand-500/25"
+        className="inline-flex items-center gap-1 rounded-full bg-white/5 px-2.5 py-1 text-xs font-semibold text-ink-200 ring-1 ring-inset ring-white/10"
         title={`${profile.xp ?? 0} XP — ${levelTitle(lp.level)}`}
       >
         <SparkIcon className="h-3.5 w-3.5" />

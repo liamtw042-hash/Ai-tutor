@@ -453,8 +453,8 @@ export default function Practice() {
     <div className="space-y-8">
       <div className="flex flex-col justify-between gap-3 sm:flex-row sm:items-center">
         <div>
-          <h1 className="font-display text-3xl font-bold text-white">Practice</h1>
-          <p className="mt-1 text-ink-300">
+          <h1 className="page-title">Practice</h1>
+          <p className="page-subtitle">
             Every answer feeds your mastery map and spaced-repetition queue.
           </p>
         </div>
@@ -520,7 +520,7 @@ export default function Practice() {
         ))}
         <button
           onClick={() => setGenOpen(true)}
-          className="chip border-brand-500/40 text-brand-200 transition hover:bg-brand-500/10"
+          className="chip transition hover:border-white/20"
         >
           <WandIcon className="h-3.5 w-3.5" /> Generate new
         </button>
@@ -580,7 +580,7 @@ export default function Practice() {
                       className={cn(
                         "flex w-full items-center gap-3 rounded-xl border px-4 py-3 text-left text-sm transition",
                         state === "idle" &&
-                          "border-white/10 bg-ink-850 hover:border-brand-500/40 hover:bg-white/5",
+                          "border-white/10 bg-ink-850 hover:border-white/15 hover:bg-white/5",
                         state === "correct" &&
                           "border-emerald-500/50 bg-emerald-500/10 text-emerald-100",
                         state === "wrong" &&
@@ -623,7 +623,7 @@ export default function Practice() {
           {/* Solution reveal for MC / written */}
           {question.type === "multiple-choice" && revealed && (
             <div className="mt-5 rounded-xl border border-white/10 bg-ink-850 p-4">
-              <p className="mb-1 flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wide text-brand-300">
+              <p className="mb-1 flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wide text-ink-500">
                 <TargetIcon className="h-3.5 w-3.5" /> Worked solution
               </p>
               <p className="whitespace-pre-line text-sm leading-relaxed text-ink-200">
@@ -638,7 +638,7 @@ export default function Practice() {
           )}
           {question.type !== "multiple-choice" && (
             <details className="mt-5 rounded-xl border border-white/10 bg-ink-850 p-4">
-              <summary className="cursor-pointer text-xs font-semibold uppercase tracking-wide text-brand-300">
+              <summary className="cursor-pointer text-xs font-semibold uppercase tracking-wide text-ink-500">
                 Show model answer & criteria
               </summary>
               <p className="mt-2 whitespace-pre-line text-sm leading-relaxed text-ink-200">

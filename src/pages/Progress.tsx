@@ -146,8 +146,8 @@ export default function ProgressPage() {
   return (
     <div className="space-y-8">
       <div>
-        <h1 className="font-display text-3xl font-bold text-white">Progress</h1>
-        <p className="mt-1 text-ink-300">
+        <h1 className="page-title">Progress</h1>
+        <p className="page-subtitle">
           Real numbers from your work — no vanity metrics.
         </p>
       </div>
@@ -288,7 +288,7 @@ export default function ProgressPage() {
       {/* Badges */}
       <Card>
         <div className="mb-4 flex items-center gap-2">
-          <TrophyIcon className="h-[18px] w-[18px] text-brand-300" />
+          <TrophyIcon className="h-[18px] w-[18px] text-ink-500" />
           <h2 className="font-semibold text-white">Achievements</h2>
           <span className="ml-auto text-xs text-ink-400">
             {earned.size}/{BADGES.length}
@@ -324,7 +324,7 @@ export default function ProgressPage() {
       {/* Leaderboard (opt-in) */}
       <Card>
         <div className="mb-4 flex flex-wrap items-center gap-2">
-          <UsersIcon className="h-[18px] w-[18px] text-brand-300" />
+          <UsersIcon className="h-[18px] w-[18px] text-ink-500" />
           <h2 className="font-semibold text-white">Leaderboard</h2>
           <span className="text-xs text-ink-500">anonymous · opt-in</span>
           <Button
@@ -341,7 +341,7 @@ export default function ProgressPage() {
         {profile?.leaderboardOptIn && (
           <p className="mb-3 text-xs text-ink-400">
             You appear as{" "}
-            <span className="font-semibold text-brand-300">
+            <span className="font-semibold text-ink-200">
               {profile.leaderboardAlias}
             </span>
             .

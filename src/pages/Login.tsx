@@ -114,7 +114,7 @@ export default function Login() {
 
       <p className="mt-6 text-center text-sm text-ink-400">
         New to StudyMate?{" "}
-        <Link to="/signup" className="font-medium text-brand-300 hover:text-brand-200">
+        <Link to="/signup" className="font-medium text-ink-300 hover:text-white">
           Create an account
         </Link>
       </p>

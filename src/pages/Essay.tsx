@@ -107,10 +107,10 @@ export default function Essay() {
     <div className="space-y-8">
       <div className="flex flex-col justify-between gap-3 sm:flex-row sm:items-center">
         <div>
-          <h1 className="font-display text-3xl font-bold text-white">
+          <h1 className="page-title">
             Essay Feedback
           </h1>
-          <p className="mt-1 text-ink-300">
+          <p className="page-subtitle">
             Paste a response and get structured, NESA-aligned marking in seconds.
           </p>
         </div>
@@ -256,7 +256,7 @@ export default function Essay() {
               {/* Next steps */}
               {fb.nextSteps?.length > 0 && (
                 <div className="rounded-xl border border-brand-500/20 bg-brand-500/5 p-4">
-                  <p className="mb-2 flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wide text-brand-300">
+                  <p className="mb-2 flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wide text-ink-500">
                     <SparkIcon className="h-3.5 w-3.5" /> Priority next steps
                   </p>
                   <ol className="space-y-2">
@@ -267,7 +267,7 @@ export default function Essay() {
                       >
                         <span
                           className={cn(
-                            "grid h-5 w-5 shrink-0 place-items-center rounded-full bg-brand-500/20 text-[11px] font-bold text-brand-200",
+                            "grid h-5 w-5 shrink-0 place-items-center rounded-full bg-white/8 text-[11px] font-semibold text-ink-200",
                           )}
                         >
                           {i + 1}

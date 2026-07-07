@@ -246,10 +246,10 @@ export default function Tutor() {
           <div className="mx-auto mb-4 grid h-14 w-14 place-items-center rounded-2xl bg-brand-500/15 text-brand-300 ring-1 ring-inset ring-brand-500/25">
             <ChatIcon className="h-7 w-7" />
           </div>
-          <h1 className="font-display text-3xl font-bold text-white">
+          <h1 className="page-title">
             AI Tutor
           </h1>
-          <p className="mt-2 text-ink-300">
+          <p className="page-subtitle">
             Pick a subject and start a conversation. Your tutor guides you to the
             answer — it won't just hand it over.
           </p>
@@ -269,7 +269,7 @@ export default function Tutor() {
                     },
                   ]);
                 }}
-                className="card flex items-center gap-3 p-4 text-left transition hover:border-brand-500/30"
+                className="card flex items-center gap-3 p-4 text-left transition hover:border-white/15"
               >
                 <div
                   className="grid h-11 w-11 place-items-center rounded-xl text-xl"
@@ -391,7 +391,7 @@ export default function Tutor() {
             <button
               key={q}
               onClick={() => void send(q)}
-              className="chip transition hover:border-brand-500/40 hover:text-brand-200"
+              className="chip transition hover:border-white/15 hover:text-white"
             >
               <SparkIcon className="h-3 w-3" /> {q}
             </button>
@@ -452,7 +452,7 @@ export default function Tutor() {
               "grid h-[52px] w-[52px] shrink-0 place-items-center rounded-xl border transition disabled:opacity-40",
               recog.listening
                 ? "animate-pulse border-red-500/50 bg-red-500/15 text-red-300"
-                : "border-white/10 bg-white/5 text-ink-200 hover:border-brand-500/40 hover:text-brand-200",
+                : "border-white/10 bg-white/5 text-ink-200 hover:border-white/15 hover:text-white",
             )}
           >
             {recog.listening ? (

@@ -137,11 +137,11 @@ export default function Planner() {
   if (!premium) {
     return (
       <div className="mx-auto max-w-xl">
-        <Card className="p-8 text-center">
+        <Card className="p-6 text-center">
           <div className="mx-auto mb-4 grid h-14 w-14 place-items-center rounded-2xl bg-brand-500/15 text-brand-300">
             <LockIcon className="h-7 w-7" />
           </div>
-          <h1 className="font-display text-2xl font-bold text-white">
+          <h1 className="page-title">
             Study plans are a Premium feature
           </h1>
           <p className="mt-3 text-sm leading-relaxed text-ink-300">
@@ -172,10 +172,10 @@ export default function Planner() {
     <div className="space-y-6">
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div>
-          <h1 className="font-display text-3xl font-bold text-white">
+          <h1 className="page-title">
             Study Plan
           </h1>
-          <p className="mt-1 text-ink-300">
+          <p className="page-subtitle">
             A personalised countdown to your exams, rebuilt around your real
             weak spots.
           </p>
@@ -194,7 +194,7 @@ export default function Planner() {
       </div>
 
       {!plan ? (
-        <Card className="p-8 text-center">
+        <Card className="p-6 text-center">
           <div className="mx-auto mb-4 grid h-14 w-14 place-items-center rounded-2xl bg-brand-500/15 text-brand-300">
             <CalendarIcon className="h-7 w-7" />
           </div>
@@ -283,9 +283,9 @@ export default function Planner() {
                         <Link
                           key={ti}
                           to={meta.to}
-                          className="flex items-start gap-3 rounded-xl border border-white/5 bg-white/[0.02] p-3 transition hover:border-brand-500/30"
+                          className="flex items-start gap-3 rounded-xl border border-white/5 bg-white/[0.02] p-3 transition hover:border-white/15"
                         >
-                          <span className="mt-0.5 grid h-8 w-8 shrink-0 place-items-center rounded-lg bg-brand-500/12 text-brand-300">
+                          <span className="mt-0.5 grid h-8 w-8 shrink-0 place-items-center rounded-lg bg-white/5 text-ink-300">
                             <Icon className="h-4 w-4" />
                           </span>
                           <div className="min-w-0">

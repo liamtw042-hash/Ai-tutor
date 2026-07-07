@@ -230,11 +230,11 @@ export default function Exam() {
   if (!premium) {
     return (
       <div className="mx-auto max-w-xl">
-        <Card className="p-8 text-center">
+        <Card className="p-6 text-center">
           <div className="mx-auto mb-4 grid h-14 w-14 place-items-center rounded-2xl bg-brand-500/15 text-brand-300">
             <LockIcon className="h-7 w-7" />
           </div>
-          <h1 className="font-display text-2xl font-bold text-white">
+          <h1 className="page-title">
             Exam Mode is a Premium feature
           </h1>
           <p className="mt-3 text-sm leading-relaxed text-ink-300">
@@ -277,7 +277,7 @@ export default function Exam() {
     return (
       <div className="mx-auto max-w-3xl space-y-6">
         <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}>
-          <Card className="p-8 text-center">
+          <Card className="p-6 text-center">
             <p className="text-sm text-ink-400">
               {subject.name} · timed session
             </p>
@@ -295,7 +295,7 @@ export default function Exam() {
               Finished in {Math.floor(result.durationSeconds / 60)}m{" "}
               {result.durationSeconds % 60}s of{" "}
               {Math.floor(result.timeLimitSeconds / 60)}m ·{" "}
-              <span className="font-semibold text-brand-300">+60 XP</span>
+              <span className="font-semibold text-ink-200">+60 XP</span>
             </p>
             <p className="mx-auto mt-4 max-w-md text-[11px] leading-relaxed text-ink-500">
               {DISCLAIMERS.marking}
@@ -393,7 +393,7 @@ export default function Exam() {
         {questions.map((q, qi) => (
           <Card key={q.id} className="p-6">
             <div className="mb-3 flex flex-wrap items-center gap-2">
-              <span className="font-display text-sm font-bold text-brand-300">
+              <span className="font-display text-sm font-semibold text-ink-300">
                 Q{qi + 1}
               </span>
               <Badge tone="neutral">{q.topic}</Badge>
@@ -462,8 +462,8 @@ export default function Exam() {
   return (
     <div className="space-y-8">
       <div>
-        <h1 className="font-display text-3xl font-bold text-white">Exam Mode</h1>
-        <p className="mt-1 text-ink-300">
+        <h1 className="page-title">Exam Mode</h1>
+        <p className="page-subtitle">
           A timed, past-paper-style session: ~8 questions across topics, marked
           like the real thing. Exam pressure is a skill — train it.
         </p>
@@ -480,7 +480,7 @@ export default function Exam() {
               key={id}
               onClick={() => start(id)}
               disabled={bank.length < 3}
-              className="card group p-5 text-left transition hover:border-brand-500/40 disabled:opacity-40"
+              className="card group p-6 text-left transition hover:border-white/15 disabled:opacity-40"
             >
               <span
                 className="grid h-10 w-10 place-items-center rounded-xl text-lg"
@@ -490,7 +490,7 @@ export default function Exam() {
               >
                 {s.icon}
               </span>
-              <p className="mt-3 font-semibold text-white group-hover:text-brand-200">
+              <p className="mt-3 font-semibold text-white group-hover:text-white">
                 {s.name}
               </p>
               <p className="mt-0.5 text-xs text-ink-400">

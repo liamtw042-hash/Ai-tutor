@@ -116,18 +116,18 @@ export default function Review() {
           initial={{ opacity: 0, scale: 0.96 }}
           animate={{ opacity: 1, scale: 1 }}
         >
-          <Card className="p-8 text-center">
+          <Card className="p-6 text-center">
             {done > 0 ? (
               <>
                 <div className="mx-auto mb-4 grid h-14 w-14 place-items-center rounded-2xl bg-emerald-500/15 text-emerald-400">
                   <CheckIcon className="h-7 w-7" />
                 </div>
-                <h1 className="font-display text-2xl font-bold text-white">
+                <h1 className="page-title">
                   Review complete
                 </h1>
-                <p className="mt-2 text-ink-300">
+                <p className="page-subtitle">
                   {done} item{done === 1 ? "" : "s"} reviewed ·{" "}
-                  <span className="font-semibold text-brand-300">
+                  <span className="font-semibold text-ink-200">
                     +{xpEarned} XP
                   </span>
                 </p>
@@ -141,7 +141,7 @@ export default function Review() {
                 <div className="mx-auto mb-4 grid h-14 w-14 place-items-center rounded-2xl bg-brand-500/15 text-brand-300">
                   <BrainIcon className="h-7 w-7" />
                 </div>
-                <h1 className="font-display text-2xl font-bold text-white">
+                <h1 className="page-title">
                   Nothing due right now
                 </h1>
                 <p className="mt-2 text-sm text-ink-400">
@@ -172,7 +172,7 @@ export default function Review() {
     <div className="mx-auto max-w-2xl space-y-5">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="font-display text-2xl font-bold text-white">Review</h1>
+          <h1 className="page-title">Review</h1>
           <p className="mt-0.5 text-sm text-ink-400">
             {queue.length} left · graded by SM-2 spaced repetition
           </p>
@@ -239,7 +239,7 @@ export default function Review() {
             {revealed ? (
               <>
                 <div className="mt-5 rounded-xl border border-white/10 bg-ink-850 p-4">
-                  <p className="mb-1 text-xs font-semibold uppercase tracking-wide text-brand-300">
+                  <p className="mb-1 text-xs font-semibold uppercase tracking-wide text-ink-500">
                     Answer
                   </p>
                   <p className="whitespace-pre-line text-sm leading-relaxed text-ink-100">

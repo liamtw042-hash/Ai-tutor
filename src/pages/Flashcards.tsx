@@ -160,10 +160,10 @@ export default function Flashcards() {
     <div className="space-y-8">
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div>
-          <h1 className="font-display text-3xl font-bold text-white">
+          <h1 className="page-title">
             Flashcards
           </h1>
-          <p className="mt-1 text-ink-300">
+          <p className="page-subtitle">
             Make decks yourself or generate them with AI — every card you study
             joins your spaced-repetition queue.
           </p>
@@ -194,7 +194,7 @@ export default function Flashcards() {
               <button
                 key={deck.id}
                 onClick={() => openDeck(deck)}
-                className="card group p-5 text-left transition hover:border-brand-500/30"
+                className="card group p-6 text-left transition hover:border-white/15"
               >
                 <div className="flex items-start justify-between">
                   <span
@@ -211,7 +211,7 @@ export default function Flashcards() {
                     </Badge>
                   )}
                 </div>
-                <p className="mt-3 font-semibold text-white group-hover:text-brand-200">
+                <p className="mt-3 font-semibold text-white group-hover:text-white">
                   {deck.name}
                 </p>
                 <p className="mt-0.5 text-xs text-ink-400">
@@ -469,7 +469,7 @@ function DeckDetail({
 
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div>
-          <h1 className="font-display text-2xl font-bold text-white sm:text-3xl">
+          <h1 className="page-title">
             {deck.name}
           </h1>
           <p className="mt-1 text-sm text-ink-400">
@@ -515,7 +515,7 @@ function DeckDetail({
             key={mode}
             disabled={cards.length < (mode === "match" ? 3 : 1)}
             onClick={() => onStudy(mode)}
-            className="card p-5 text-left transition hover:border-brand-500/40 disabled:cursor-not-allowed disabled:opacity-40"
+            className="card p-6 text-left transition hover:border-white/15 disabled:cursor-not-allowed disabled:opacity-40"
           >
             <p className="font-semibold text-white">{title}</p>
             <p className="mt-1 text-xs leading-relaxed text-ink-400">{desc}</p>
@@ -660,16 +660,16 @@ function RecallSession({
     const total = results.good + results.again;
     return (
       <div className="mx-auto max-w-md">
-        <Card className="p-8 text-center">
+        <Card className="p-6 text-center">
           <div className="mx-auto mb-4 grid h-14 w-14 place-items-center rounded-2xl bg-brand-500/15 text-2xl">
             🎉
           </div>
-          <h1 className="font-display text-2xl font-bold text-white">
+          <h1 className="page-title">
             Deck complete
           </h1>
-          <p className="mt-2 text-ink-300">
+          <p className="page-subtitle">
             {results.good}/{total} recalled ·{" "}
-            <span className="font-semibold text-brand-300">
+            <span className="font-semibold text-ink-200">
               +{total * 2} XP
             </span>
           </p>
@@ -750,7 +750,7 @@ function RecallSession({
           />
           {flipped && (
             <div className="mt-4 rounded-xl border border-brand-500/25 bg-brand-500/5 p-4">
-              <p className="mb-1 text-xs font-semibold uppercase tracking-wide text-brand-300">
+              <p className="mb-1 text-xs font-semibold uppercase tracking-wide text-ink-500">
                 Model answer
               </p>
               <p className="whitespace-pre-line text-sm leading-relaxed text-ink-100">
@@ -860,14 +860,14 @@ function MatchGame({
     const secs = Math.round((finishedAt - startedAt) / 1000);
     return (
       <div className="mx-auto max-w-md">
-        <Card className="p-8 text-center">
+        <Card className="p-6 text-center">
           <div className="mx-auto mb-4 grid h-14 w-14 place-items-center rounded-2xl bg-emerald-500/15 text-2xl">
             ⚡
           </div>
-          <h1 className="font-display text-2xl font-bold text-white">
+          <h1 className="page-title">
             {secs}s
           </h1>
-          <p className="mt-2 text-ink-300">
+          <p className="page-subtitle">
             {pool.length} pairs matched · {misses} miss{misses === 1 ? "" : "es"}
           </p>
           <Button className="mt-6 w-full" onClick={onExit}>

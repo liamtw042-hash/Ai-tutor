@@ -177,7 +177,7 @@ export default function Settings() {
           <SettingsIcon className="h-6 w-6" />
         </div>
         <div>
-          <h1 className="font-display text-3xl font-bold text-white">Settings</h1>
+          <h1 className="page-title">Settings</h1>
           <p className="text-sm text-ink-400">
             Change your year, subjects and profile any time — your streak, XP and
             progress stay exactly where they are.
@@ -310,7 +310,7 @@ export default function Settings() {
           <div className="rounded-xl border border-white/5 bg-white/[0.02] p-4">
             <div className="flex items-center justify-between gap-3">
               <div className="flex items-center gap-2">
-                <UsersIcon className="h-[18px] w-[18px] text-brand-300" />
+                <UsersIcon className="h-[18px] w-[18px] text-ink-500" />
                 <div>
                   <p className="text-sm font-medium text-ink-100">
                     Anonymous leaderboard

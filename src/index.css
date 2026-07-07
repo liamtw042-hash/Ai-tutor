@@ -2,6 +2,42 @@
 @tailwind components;
 @tailwind utilities;
 
+/* ===========================================================================
+   StudyMate design system
+   ---------------------------------------------------------------------------
+   A small, strict system for a calm, premium dark UI (Linear / Vercel style).
+
+   TYPE SCALE (only these — no in-between sizes):
+     page title   24px / font-display / semibold   → .page-title
+     section      16px / semibold                   → .section-title
+     card title   14px / semibold                   → .card-title
+     body         14px / normal                     → text-sm
+     caption      12px                              → text-xs
+   Headings are clearly heavier + larger than body.
+
+   SPACING SCALE (4px base — snap everything to these):
+     4 8 12 16 24 32 48  →  Tailwind 1 2 3 4 6 8 12
+   Section gaps: space-y-8 (32). In-card gaps: space-y-4/6.
+
+   COLOUR (disciplined):
+     background   ink-950              (one canvas)
+     surface      ink-900/60           (one raised surface = .card)
+     border       white/8              (one hairline)
+     text         primary  = white
+                  secondary= ink-300
+                  muted    = ink-400   (max 3 opacities)
+     ACCENT (violet) appears ONLY on: primary buttons (.btn-primary),
+     the active nav item, and one deliberate highlight per screen.
+     Everything else is greyscale on the dark canvas.
+
+   RADIUS:
+     surfaces (cards, modals, tiles) = rounded-2xl (16px)
+     controls (buttons, inputs, chips) = rounded-xl (12px)
+
+   BORDERS/SURFACES: prefer spacing + subtle background over borders.
+     Max one level of card nesting.
+   =========================================================================== */
+
 @layer base {
   :root {
     color-scheme: dark;
@@ -14,10 +50,13 @@
   }
 
   body {
-    @apply bg-ink-950 text-ink-100 font-sans antialiased;
-    background-image:
-      radial-gradient(ellipse 90% 55% at 50% -8%, rgba(124, 101, 241, 0.16), transparent 55%),
-      radial-gradient(ellipse 60% 40% at 90% 10%, rgba(93, 55, 201, 0.08), transparent 60%);
+    @apply bg-ink-950 text-ink-300 font-sans antialiased;
+    /* One faint ambient wash — the only ambient accent in the app. */
+    background-image: radial-gradient(
+      ellipse 70% 45% at 50% -10%,
+      rgba(124, 101, 241, 0.07),
+      transparent 60%
+    );
     background-attachment: fixed;
   }
 
@@ -43,38 +82,56 @@
 }
 
 @layer components {
+  /* ---- Surfaces ---- */
   .card {
-    @apply rounded-2xl border border-white/5 bg-ink-900/70 backdrop-blur-sm shadow-card;
+    @apply rounded-2xl border border-white/10 bg-ink-900/60 shadow-card;
   }
 
+  /* ---- Typography ---- */
+  .page-title {
+    @apply font-display text-2xl font-semibold tracking-tight text-white;
+  }
+  .page-subtitle {
+    @apply mt-1 text-sm text-ink-400;
+  }
+  .section-title {
+    @apply text-base font-semibold text-white;
+  }
+  .card-title {
+    @apply text-sm font-semibold text-white;
+  }
+  .eyebrow {
+    @apply text-xs font-semibold uppercase tracking-widest text-ink-500;
+  }
+
+  /* ---- Buttons (accent lives only on .btn-primary) ---- */
   .btn {
     @apply inline-flex items-center justify-center gap-2 rounded-xl px-4 py-2.5 text-sm font-semibold transition
-      focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-400/60 disabled:opacity-50 disabled:pointer-events-none;
+      focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-400/50 disabled:opacity-50 disabled:pointer-events-none;
   }
   .btn-primary {
-    @apply btn bg-brand-600 text-white hover:bg-brand-500 shadow-glow;
+    @apply btn bg-brand-600 text-white hover:bg-brand-500;
   }
   .btn-ghost {
-    @apply btn bg-white/5 text-ink-100 hover:bg-white/10 border border-white/10;
+    @apply btn border border-white/10 bg-white/5 text-ink-100 hover:bg-white/10;
   }
   .btn-outline {
-    @apply btn border border-brand-500/40 text-brand-200 hover:bg-brand-500/10;
+    @apply btn border border-white/10 text-ink-100 hover:bg-white/5;
   }
   .btn-danger {
-    @apply btn bg-red-500/15 text-red-300 border border-red-500/30 hover:bg-red-500/25;
+    @apply btn border border-red-500/25 bg-red-500/10 text-red-300 hover:bg-red-500/20;
   }
 
+  /* ---- Inputs ---- */
   .input {
     @apply w-full rounded-xl border border-white/10 bg-ink-850 px-3.5 py-2.5 text-sm text-ink-100
-      placeholder:text-ink-400 focus:outline-none focus:border-brand-500/60 focus:ring-2 focus:ring-brand-500/20 transition;
+      placeholder:text-ink-500 focus:outline-none focus:border-brand-500/50 focus:ring-2 focus:ring-brand-500/20 transition;
   }
-
   .label {
-    @apply block text-xs font-medium uppercase tracking-wide text-ink-300 mb-1.5;
+    @apply mb-2 block text-xs font-medium text-ink-400;
   }
-
   .chip {
-    @apply inline-flex items-center gap-1.5 rounded-full border border-white/10 bg-white/5 px-3 py-1 text-xs font-medium text-ink-200;
+    @apply inline-flex items-center gap-1.5 rounded-full border border-white/10 bg-white/5 px-3 py-1 text-xs font-medium text-ink-300;
   }
 
   .prose-tutor p {

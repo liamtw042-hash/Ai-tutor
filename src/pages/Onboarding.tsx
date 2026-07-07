@@ -93,10 +93,10 @@ export default function Onboarding() {
         <span className="text-sm text-ink-400">Quick setup · ~30 seconds</span>
       </div>
 
-      <h1 className="font-display text-3xl font-bold text-white">
+      <h1 className="page-title">
         What year are you in?
       </h1>
-      <p className="mt-2 text-ink-300">
+      <p className="page-subtitle">
         We'll tailor topics, practice and marking to your NSW stage — Year 10
         (Stage 5), Year 11 (Preliminary) or Year 12 (HSC).
       </p>
@@ -124,7 +124,7 @@ export default function Onboarding() {
       <h2 className="mt-10 font-display text-2xl font-bold text-white">
         Which subjects are you studying?
       </h2>
-      <p className="mt-2 text-ink-300">
+      <p className="page-subtitle">
         Pick all that apply — we'll tailor your dashboard, practice and tutor to
         them. You can change these later.
       </p>

@@ -48,7 +48,7 @@ export function Card({
   className?: string;
   children: ReactNode;
 }) {
-  return <div className={cn("card p-5", className)}>{children}</div>;
+  return <div className={cn("card p-6", className)}>{children}</div>;
 }
 
 // --- Spinner ---
@@ -204,14 +204,14 @@ export function Stat({
   className?: string;
 }) {
   return (
-    <div className={cn("card flex items-center gap-3.5 p-4", className)}>
+    <div className={cn("card flex items-center gap-3 p-4", className)}>
       {icon && (
-        <div className="grid h-10 w-10 shrink-0 place-items-center rounded-xl bg-brand-500/12 text-brand-300">
+        <div className="grid h-9 w-9 shrink-0 place-items-center rounded-xl bg-white/5 text-ink-300">
           {icon}
         </div>
       )}
       <div className="min-w-0">
-        <div className="truncate text-xl font-bold text-white">{value}</div>
+        <div className="truncate text-lg font-semibold text-white">{value}</div>
         <div className="truncate text-xs text-ink-400">
           {label}
           {hint ? <span className="text-ink-500"> · {hint}</span> : null}
@@ -254,7 +254,7 @@ export function Modal({
         >
           <motion.div
             className={cn(
-              "card w-full p-5 sm:p-6",
+              "card w-full p-6",
               wide ? "max-w-2xl" : "max-w-md",
             )}
             initial={{ opacity: 0, y: 16, scale: 0.97 }}
@@ -264,11 +264,7 @@ export function Modal({
             onClick={(e) => e.stopPropagation()}
           >
             <div className="mb-4 flex items-center justify-between">
-              {title && (
-                <h3 className="font-display text-lg font-bold text-white">
-                  {title}
-                </h3>
-              )}
+              {title && <h3 className="section-title">{title}</h3>}
               <button
                 onClick={onClose}
                 className="rounded-lg p-1.5 text-ink-400 hover:bg-white/10 hover:text-white"
@@ -281,6 +277,34 @@ export function Modal({
         </motion.div>
       )}
     </AnimatePresence>
+  );
+}
+
+// --- Page header (one consistent title treatment for every screen) ---
+export function PageHeader({
+  title,
+  subtitle,
+  actions,
+  className,
+}: {
+  title: string;
+  subtitle?: string;
+  actions?: ReactNode;
+  className?: string;
+}) {
+  return (
+    <div
+      className={cn(
+        "flex flex-wrap items-start justify-between gap-4",
+        className,
+      )}
+    >
+      <div className="min-w-0">
+        <h1 className="page-title">{title}</h1>
+        {subtitle && <p className="page-subtitle max-w-xl">{subtitle}</p>}
+      </div>
+      {actions && <div className="flex shrink-0 items-center gap-2">{actions}</div>}
+    </div>
   );
 }
 
@@ -298,15 +322,11 @@ export function SectionTitle({
 }) {
   return (
     <div className={className}>
-      {eyebrow && (
-        <div className="mb-2 text-xs font-semibold uppercase tracking-widest text-brand-300">
-          {eyebrow}
-        </div>
-      )}
-      <h2 className="font-display text-2xl font-bold text-white sm:text-3xl">
+      {eyebrow && <div className="eyebrow mb-3">{eyebrow}</div>}
+      <h2 className="font-display text-2xl font-semibold tracking-tight text-white sm:text-3xl">
         {title}
       </h2>
-      {subtitle && <p className="mt-2 max-w-2xl text-ink-300">{subtitle}</p>}
+      {subtitle && <p className="mt-3 max-w-2xl text-ink-400">{subtitle}</p>}
     </div>
   );
 }
@@ -324,10 +344,10 @@ export function EmptyState({
   action?: ReactNode;
 }) {
   return (
-    <div className="flex flex-col items-center justify-center rounded-2xl border border-dashed border-white/10 px-6 py-12 text-center">
-      {icon && <div className="mb-3 text-brand-300">{icon}</div>}
-      <p className="font-semibold text-ink-100">{title}</p>
-      {children && <p className="mt-1 max-w-sm text-sm text-ink-400">{children}</p>}
+    <div className="flex flex-col items-center justify-center rounded-2xl border border-dashed border-white/8 px-6 py-12 text-center">
+      {icon && <div className="mb-3 text-ink-500">{icon}</div>}
+      <p className="text-sm font-semibold text-white">{title}</p>
+      {children && <p className="mt-1.5 max-w-sm text-sm text-ink-400">{children}</p>}
       {action && <div className="mt-4">{action}</div>}
     </div>
   );
@@ -381,8 +401,8 @@ export function Segmented<T extends string>({
           className={cn(
             "rounded-lg px-3 py-1.5 text-xs font-semibold transition",
             value === o.value
-              ? "bg-brand-600 text-white shadow-glow"
-              : "text-ink-300 hover:text-white",
+              ? "bg-ink-700 text-white"
+              : "text-ink-400 hover:text-white",
           )}
         >
           {o.label}
