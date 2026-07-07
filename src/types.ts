@@ -50,24 +50,40 @@ export function stageLabel(id: YearLevel | undefined | null): string {
   return `${m.label} (${m.stage})`;
 }
 
-export type SubjectId =
-  | "math-adv"
-  | "math-ext1"
-  | "english-adv"
-  | "english-std"
-  | "biology"
-  | "chemistry"
-  | "physics"
-  | "modern-history"
-  | "economics"
-  | "business-studies";
+/**
+ * A subject/course id. Now a free string rather than a fixed union so the app
+ * can carry the full NESA course range across Years 10–12 (see data/subjects).
+ */
+export type SubjectId = string;
+
+/** NESA key learning areas (KLAs) used to group the subject picker. */
+export type SubjectArea =
+  | "English"
+  | "Mathematics"
+  | "Science"
+  | "HSIE"
+  | "Creative Arts"
+  | "TAS"
+  | "PDHPE"
+  | "Languages"
+  | "VET";
+
+/**
+ * How confident we are in a subject's *topic structure* (the subject's
+ * existence, name and KLA are confirmed against the NESA course index):
+ *  - "verified"   → topic/module list confirmed against a NESA syllabus page
+ *  - "structural" → follows the established real syllabus structure (not
+ *                   re-fetched page-by-page this session)
+ *  - "approx"     → indicative topic list, not closely mapped to the syllabus
+ */
+export type Verification = "verified" | "structural" | "approx";
 
 export interface Subject {
   id: SubjectId;
   name: string;
   short: string;
-  /** NESA learning area grouping */
-  area: "Mathematics" | "English" | "Science" | "HSIE";
+  /** NESA key learning area (KLA) grouping */
+  area: SubjectArea;
   /** tailwind gradient stops for the subject accent */
   gradient: [string, string];
   icon: string; // emoji/glyph used in cards
@@ -86,6 +102,8 @@ export interface Subject {
   years: YearLevel[];
   /** how many marking bands this subject reports (most HSC = 5, some 6) */
   bands: number;
+  /** confidence in this subject's topic structure (see Verification) */
+  verification: Verification;
 }
 
 export type QuestionType = "multiple-choice" | "short-answer" | "extended-response";

@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { useAuth } from "@/lib/auth";
 import { subjectsForYear, getSubject } from "@/data/subjects";
+import { SubjectPicker } from "@/components/SubjectPicker";
 import {
   Badge,
   Button,
@@ -48,7 +49,6 @@ export default function Settings() {
     setLeaderboardAlias(profile.leaderboardAlias ?? "");
   }, [profile]);
 
-  const offered = useMemo(() => subjectsForYear(yearLevel), [yearLevel]);
 
   const chooseYear = (id: YearLevel) => {
     setSaved(false);
@@ -201,48 +201,12 @@ export default function Settings() {
             {subjects.length} selected
           </Badge>
         </div>
-        <div className="mt-4 grid gap-3 sm:grid-cols-2">
-          {offered.map((s) => {
-            const active = subjects.includes(s.id);
-            return (
-              <button
-                key={s.id}
-                onClick={() => toggleSubject(s.id)}
-                className={cn(
-                  "flex items-center gap-3 rounded-2xl border p-3.5 text-left transition",
-                  active
-                    ? "border-brand-500/50 bg-brand-500/10 ring-1 ring-inset ring-brand-500/30"
-                    : "border-white/8 bg-ink-900/50 hover:border-white/20",
-                )}
-              >
-                <div
-                  className="grid h-10 w-10 shrink-0 place-items-center rounded-xl text-lg"
-                  style={{
-                    background: `linear-gradient(135deg, ${s.gradient[0]}, ${s.gradient[1]})`,
-                  }}
-                  aria-hidden
-                >
-                  {s.icon}
-                </div>
-                <div className="min-w-0 flex-1">
-                  <p className="truncate text-sm font-semibold text-white">
-                    {s.name}
-                  </p>
-                  <p className="truncate text-xs text-ink-400">{s.blurb}</p>
-                </div>
-                <div
-                  className={cn(
-                    "grid h-6 w-6 shrink-0 place-items-center rounded-full border transition",
-                    active
-                      ? "border-brand-400 bg-brand-500 text-white"
-                      : "border-white/20 text-transparent",
-                  )}
-                >
-                  <CheckIcon className="h-4 w-4" />
-                </div>
-              </button>
-            );
-          })}
+        <div className="mt-4">
+          <SubjectPicker
+            year={yearLevel}
+            selected={subjects}
+            onToggle={toggleSubject}
+          />
         </div>
       </Card>
 
