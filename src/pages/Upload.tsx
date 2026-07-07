@@ -10,7 +10,7 @@ import {
   uploadWork,
   validateFile,
 } from "@/lib/uploads";
-import { SUBJECTS, getSubject } from "@/data/subjects";
+import { DEMO_SUBJECT_IDS, getSubject } from "@/data/subjects";
 import { DISCLAIMERS } from "@/data/nesa";
 import {
   Badge,
@@ -53,7 +53,7 @@ export default function UploadPage() {
   const premium = isPremium(profile);
 
   const availableSubjects: SubjectId[] =
-    profile?.subjects?.length ? profile.subjects : SUBJECTS.map((s) => s.id);
+    profile?.subjects?.length ? profile.subjects : DEMO_SUBJECT_IDS;
 
   const [subjectId, setSubjectId] = useState<SubjectId>(availableSubjects[0]);
   const [file, setFile] = useState<File | null>(null);

@@ -3,7 +3,7 @@ import { motion } from "framer-motion";
 import { useAuth } from "@/lib/auth";
 import { isPremium } from "@/lib/premium";
 import { questionsForSubject } from "@/data/questions";
-import { SUBJECTS, getSubject } from "@/data/subjects";
+import { DEMO_SUBJECT_IDS, getSubject } from "@/data/subjects";
 import { DISCLAIMERS } from "@/data/nesa";
 import { markWritten } from "@/lib/claude";
 import {
@@ -62,7 +62,7 @@ export default function Exam() {
   }, [answers]);
 
   const availableSubjects: SubjectId[] =
-    profile?.subjects?.length ? profile.subjects : SUBJECTS.map((s) => s.id);
+    profile?.subjects?.length ? profile.subjects : DEMO_SUBJECT_IDS;
 
   useEffect(() => {
     if (configured && user && premium) {

@@ -15,7 +15,7 @@ import {
   StopIcon,
 } from "@/components/icons";
 import { LogoMark } from "@/components/Logo";
-import { SUBJECTS, getSubject } from "@/data/subjects";
+import { DEMO_SUBJECT_IDS, getSubject } from "@/data/subjects";
 import { useAuth } from "@/lib/auth";
 import { isPremium } from "@/lib/premium";
 import { tutorReply } from "@/lib/claude";
@@ -101,7 +101,7 @@ export default function Tutor() {
   const uid = profile?.uid ?? "demo";
 
   const availableSubjects: SubjectId[] =
-    profile?.subjects?.length ? profile.subjects : SUBJECTS.map((s) => s.id);
+    profile?.subjects?.length ? profile.subjects : DEMO_SUBJECT_IDS;
 
   const [subjectId, setSubjectId] = useState<SubjectId | null>(null);
   const [messages, setMessages] = useState<ChatMessage[]>([]);

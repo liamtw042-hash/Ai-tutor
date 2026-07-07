@@ -9,7 +9,7 @@ import {
   saveStudyPlan,
 } from "@/lib/firestore";
 import { weakestTopics } from "@/lib/mastery";
-import { SUBJECTS, getSubject } from "@/data/subjects";
+import { DEMO_SUBJECT_IDS, SUBJECTS, getSubject } from "@/data/subjects";
 import { dayDiff, dayLabel, sydneyDayKey } from "@/lib/dates";
 import {
   Badge,
@@ -54,7 +54,7 @@ export default function Planner() {
   const [error, setError] = useState("");
 
   const subjects: SubjectId[] =
-    profile?.subjects?.length ? profile.subjects : SUBJECTS.map((s) => s.id);
+    profile?.subjects?.length ? profile.subjects : DEMO_SUBJECT_IDS;
   const [dates, setDates] = useState<Record<string, string>>({});
   const [hours, setHours] = useState(10);
 

@@ -479,6 +479,22 @@ const DEFS: Def[] = [
 
 export const SUBJECTS: Subject[] = DEFS.map(build);
 
+/**
+ * A curated, recognisable set of subjects used when a student has no subjects
+ * selected yet (demo mode / empty selection) and for the landing page — so the
+ * UI never renders all ~65 courses as a giant flat list.
+ */
+export const DEMO_SUBJECT_IDS: SubjectId[] = [
+  "english-adv",
+  "math-adv",
+  "biology",
+  "chemistry",
+  "physics",
+  "economics",
+  "business-studies",
+  "modern-history",
+];
+
 export const SUBJECTS_BY_ID: Record<string, Subject> = Object.fromEntries(
   SUBJECTS.map((s) => [s.id, s]),
 );

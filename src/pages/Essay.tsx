@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { Badge, Button, Card, EmptyState, Progress, cn } from "@/components/ui";
 import { DocIcon, SparkIcon, TargetIcon } from "@/components/icons";
-import { SUBJECTS, getSubject } from "@/data/subjects";
+import { DEMO_SUBJECT_IDS, getSubject } from "@/data/subjects";
 import { DISCLAIMERS } from "@/data/nesa";
 import { useAuth } from "@/lib/auth";
 import { isPremium } from "@/lib/premium";
@@ -41,7 +41,7 @@ export default function Essay() {
   const uid = profile?.uid ?? "demo";
 
   const availableSubjects: SubjectId[] =
-    profile?.subjects?.length ? profile.subjects : SUBJECTS.map((s) => s.id);
+    profile?.subjects?.length ? profile.subjects : DEMO_SUBJECT_IDS;
 
   const [subjectId, setSubjectId] = useState<SubjectId>(availableSubjects[0]);
   const [questionType, setQuestionType] = useState(QUESTION_TYPES[0]);

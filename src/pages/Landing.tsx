@@ -2,7 +2,7 @@ import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
 import { Logo } from "@/components/Logo";
 import { Badge } from "@/components/ui";
-import { SUBJECTS } from "@/data/subjects";
+import { DEMO_SUBJECT_IDS, getSubject } from "@/data/subjects";
 import { DISCLAIMERS, NESA_LINKS } from "@/data/nesa";
 import {
   ArrowRightIcon,
@@ -168,7 +168,7 @@ export default function Landing() {
 
           {/* subject chips */}
           <div className="mt-16 flex flex-wrap justify-center gap-2.5">
-            {SUBJECTS.map((s) => (
+            {DEMO_SUBJECT_IDS.map((id) => getSubject(id)).map((s) => (
               <span
                 key={s.id}
                 className="chip"

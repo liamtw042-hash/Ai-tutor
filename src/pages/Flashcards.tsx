@@ -15,7 +15,7 @@ import {
 } from "@/lib/firestore";
 import { generateFlashcards } from "@/lib/claude";
 import { canUse, incrementUsage, remaining } from "@/lib/usage";
-import { SUBJECTS, getSubject, topicsForYear } from "@/data/subjects";
+import { DEMO_SUBJECT_IDS, getSubject, topicsForYear } from "@/data/subjects";
 import {
   Badge,
   Button,
@@ -230,7 +230,7 @@ export default function Flashcards() {
         onClose={() => setCreateOpen(false)}
         uid={uid}
         premium={premium}
-        subjects={profile?.subjects?.length ? profile.subjects : SUBJECTS.map((s) => s.id)}
+        subjects={profile?.subjects?.length ? profile.subjects : DEMO_SUBJECT_IDS}
         baseYear={profile?.yearLevel ?? "year12"}
         levels={profile?.subjectLevels ?? {}}
         onCreated={onDeckCreated}

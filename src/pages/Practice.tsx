@@ -9,7 +9,7 @@ import {
   WandIcon,
   XIcon,
 } from "@/components/icons";
-import { SUBJECTS, getSubject, topicsForYear } from "@/data/subjects";
+import { DEMO_SUBJECT_IDS, getSubject, topicsForYear } from "@/data/subjects";
 import { questionsForSubject } from "@/data/questions";
 import { DISCLAIMERS } from "@/data/nesa";
 import { useAuth } from "@/lib/auth";
@@ -347,7 +347,7 @@ export default function Practice() {
   const uid = profile?.uid ?? "demo";
 
   const availableSubjects: SubjectId[] =
-    profile?.subjects?.length ? profile.subjects : SUBJECTS.map((s) => s.id);
+    profile?.subjects?.length ? profile.subjects : DEMO_SUBJECT_IDS;
 
   const initialSubject =
     (params.get("subject") as SubjectId) &&
