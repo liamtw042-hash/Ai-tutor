@@ -9,6 +9,7 @@ import {
 } from "@/lib/firestore";
 import { applyGrade, intervalLabel } from "@/lib/sm2";
 import { getSubject } from "@/data/subjects";
+import { srsItemVisible } from "@/lib/level";
 import { Badge, Button, Card, EmptyState, Spinner, cn } from "@/components/ui";
 import {
   ArrowRightIcon,
@@ -26,7 +27,7 @@ const GRADES: { grade: ReviewGrade; label: string; cls: string }[] = [
 ];
 
 export default function Review() {
-  const { user, configured } = useAuth();
+  const { user, profile, configured } = useAuth();
   const [queue, setQueue] = useState<SRSItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [revealed, setRevealed] = useState(false);
@@ -44,8 +45,11 @@ export default function Review() {
       try {
         const items = await fetchDueSRSItems(user.uid);
         if (cancelled) return;
+        // Only surface items from currently-selected subjects (and the level
+        // the student now studies them at) — de-selected subjects never appear.
+        const visible = items.filter((it) => srsItemVisible(profile, it));
         // Shuffle so the same subject doesn't clump
-        const shuffled = [...items].sort(() => Math.random() - 0.5);
+        const shuffled = [...visible].sort(() => Math.random() - 0.5);
         setQueue(shuffled);
         setInitialCount(shuffled.length);
       } catch (err) {
@@ -58,7 +62,7 @@ export default function Review() {
     return () => {
       cancelled = true;
     };
-  }, [configured, user]);
+  }, [configured, user, profile]);
 
   const item = queue[0];
 

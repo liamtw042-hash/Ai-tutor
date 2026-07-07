@@ -217,6 +217,9 @@ export interface SRSItem {
   refId: string;
   subjectId: SubjectId;
   topic: string;
+  /** the year/stage the item was studied at (accelerated subjects). Optional
+   *  for legacy items created before per-subject levels existed. */
+  yearLevel?: YearLevel;
   // snapshot content
   front: string; // question prompt or card front
   back: string; // solution or card back

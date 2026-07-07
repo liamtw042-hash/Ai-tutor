@@ -87,7 +87,11 @@ export default function Planner() {
     setBusy(true);
     try {
       const attempts = user ? await fetchRecentAttempts(user.uid) : [];
-      const weak = weakestTopics(attempts, 6).map((w) => ({
+      const selected = new Set(profile?.subjects ?? []);
+      const weak = weakestTopics(
+        attempts.filter((a) => selected.has(a.subjectId)),
+        6,
+      ).map((w) => ({
         subjectName: getSubject(w.subjectId).name,
         topic: w.topic,
         accuracy: w.accuracy,

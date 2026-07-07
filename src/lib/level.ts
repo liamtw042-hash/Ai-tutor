@@ -1,6 +1,7 @@
 import { defaultLevelFor, getSubject } from "@/data/subjects";
 import {
   stageLabel,
+  type SRSItem,
   type SubjectId,
   type UserProfile,
   type YearLevel,
@@ -15,7 +16,11 @@ import {
 // ---------------------------------------------------------------------------
 
 type ProfileLike =
-  | Pick<UserProfile, "yearLevel" | "subjectLevels">
+  | {
+      yearLevel?: UserProfile["yearLevel"];
+      subjectLevels?: UserProfile["subjectLevels"];
+      subjects?: UserProfile["subjects"];
+    }
   | null
   | undefined;
 
@@ -39,4 +44,28 @@ export function isAcceleratedSubject(
 ): boolean {
   const base = profile?.yearLevel ?? "year12";
   return levelForSubject(profile, id) !== base;
+}
+
+/** True when a subject is in the student's current selection. */
+export function isSubjectSelected(
+  profile: ProfileLike,
+  id: SubjectId,
+): boolean {
+  return (profile?.subjects ?? []).includes(id);
+}
+
+/**
+ * Whether a spaced-repetition item should still surface for this student.
+ * Only items from a currently-selected subject appear; if the item records the
+ * level it was studied at, it must also match the level the student now studies
+ * that subject at. Legacy items without a level are never hidden (so changing
+ * subjects never silently deletes review progress).
+ */
+export function srsItemVisible(
+  profile: ProfileLike,
+  item: Pick<SRSItem, "subjectId" | "yearLevel">,
+): boolean {
+  if (!isSubjectSelected(profile, item.subjectId)) return false;
+  if (!item.yearLevel) return true;
+  return item.yearLevel === levelForSubject(profile, item.subjectId);
 }

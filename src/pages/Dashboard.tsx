@@ -18,6 +18,7 @@ import {
 import { levelForXp, levelProgress, levelTitle } from "@/lib/xp";
 import { BADGES_BY_ID, newlyEarnedBadges } from "@/lib/badges";
 import { getSubject } from "@/data/subjects";
+import { srsItemVisible } from "@/lib/level";
 import { sydneyDayKey } from "@/lib/dates";
 import { Heatmap } from "@/components/Heatmap";
 import {
@@ -58,7 +59,7 @@ export default function Dashboard() {
         const [a, d, s] = await Promise.all([
           fetchRecentAttempts(user.uid),
           fetchDayStats(user.uid),
-          fetchSRSSummary(user.uid),
+          fetchSRSSummary(user.uid, (item) => srsItemVisible(profile, item)),
         ]);
         if (cancelled) return;
         setAttempts(a);
@@ -74,7 +75,7 @@ export default function Dashboard() {
     return () => {
       cancelled = true;
     };
-  }, [configured, user]);
+  }, [configured, user, profile]);
 
   // Badge sweep + leaderboard sync once data is in.
   useEffect(() => {
@@ -108,7 +109,14 @@ export default function Dashboard() {
   const goal = profile?.dailyGoal || 20;
   const goalPct = Math.min(1, doneToday / goal);
 
-  const weak = useMemo(() => weakestTopics(attempts), [attempts]);
+  const subjectSet = useMemo(
+    () => new Set(profile?.subjects ?? []),
+    [profile?.subjects],
+  );
+  const weak = useMemo(
+    () => weakestTopics(attempts.filter((a) => subjectSet.has(a.subjectId))),
+    [attempts, subjectSet],
+  );
   const mastery = useMemo(
     () => computeSubjectMastery(attempts, profile?.subjects ?? []),
     [attempts, profile?.subjects],

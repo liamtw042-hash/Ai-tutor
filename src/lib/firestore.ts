@@ -259,6 +259,7 @@ export async function upsertSRSItem(
     back: string;
     options?: string[];
     correctIndex?: number;
+    yearLevel?: YearLevel;
   },
 ): Promise<void> {
   const db = requireDb();
@@ -276,6 +277,7 @@ export async function upsertSRSItem(
     back: input.back,
     ...(input.options ? { options: input.options } : {}),
     ...(input.correctIndex !== undefined ? { correctIndex: input.correctIndex } : {}),
+    ...(input.yearLevel ? { yearLevel: input.yearLevel } : {}),
     ...INITIAL_SM2,
     due: sydneyDayKey(), // first review available immediately
     lastReviewed: null,
@@ -285,7 +287,7 @@ export async function upsertSRSItem(
 }
 
 /** Items due today or earlier — the daily review queue. */
-export async function fetchDueSRSItems(uid: string, max = 60): Promise<SRSItem[]> {
+export async function fetchDueSRSItems(uid: string, max = 200): Promise<SRSItem[]> {
   const today = sydneyDayKey();
   const q = query(srsCol(uid), where("due", "<=", today), orderBy("due", "asc"), qLimit(max));
   const snap = await getDocs(q);
@@ -298,17 +300,23 @@ export interface SRSSummary {
   learned: number; // interval >= 21 days
 }
 
-export async function fetchSRSSummary(uid: string): Promise<SRSSummary> {
+export async function fetchSRSSummary(
+  uid: string,
+  isVisible: (item: SRSItem) => boolean = () => true,
+): Promise<SRSSummary> {
   const snap = await getDocs(query(srsCol(uid), qLimit(1000)));
   const today = sydneyDayKey();
   let dueToday = 0;
   let learned = 0;
+  let total = 0;
   snap.docs.forEach((d) => {
     const item = d.data() as SRSItem;
+    if (!isVisible(item)) return; // items from de-selected subjects don't count
+    total += 1;
     if (item.due <= today) dueToday += 1;
     if (item.interval >= 21) learned += 1;
   });
-  return { dueToday, total: snap.size, learned };
+  return { dueToday, total, learned };
 }
 
 /** Grade a review and persist the new SM-2 schedule. Returns the new interval. */
@@ -327,6 +335,7 @@ export async function scheduleQuestionReview(
   uid: string,
   question: Question,
   correct: boolean,
+  yearLevel?: YearLevel,
 ): Promise<void> {
   const db = requireDb();
   const id = `question-${question.id}`.replace(/[^\w:-]/g, "_").slice(0, 400);
@@ -343,6 +352,7 @@ export async function scheduleQuestionReview(
     refId: question.id,
     subjectId: question.subjectId,
     topic: question.topic,
+    ...(yearLevel ? { yearLevel } : {}),
     front: question.prompt,
     back: question.solution,
     ...(question.options ? { options: question.options } : {}),
@@ -371,6 +381,7 @@ export async function studyFlashcard(
   subjectId: SubjectId,
   topic: string,
   grade: ReviewGrade,
+  yearLevel?: YearLevel,
 ): Promise<void> {
   const db = requireDb();
   const refId = `${deckId}:${card.id}`;
@@ -387,6 +398,7 @@ export async function studyFlashcard(
     refId,
     subjectId,
     topic,
+    ...(yearLevel ? { yearLevel } : {}),
     front: card.front,
     back: card.back,
     ...INITIAL_SM2,

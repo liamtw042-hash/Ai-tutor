@@ -128,6 +128,7 @@ export default function Flashcards() {
         cards={cards}
         mode={mode}
         uid={uid}
+        yearLevel={levelForSubject(profile, activeDeck.subjectId)}
         onExit={() => setMode(null)}
       />
     );
@@ -600,19 +601,28 @@ function StudySession({
   cards,
   mode,
   uid,
+  yearLevel,
   onExit,
 }: {
   deck: Deck;
   cards: Flashcard[];
   mode: StudyMode;
   uid: string;
+  yearLevel: YearLevel;
   onExit: () => void;
 }) {
   if (mode === "match") {
     return <MatchGame deck={deck} cards={cards} onExit={onExit} />;
   }
   return (
-    <RecallSession deck={deck} cards={cards} mode={mode} uid={uid} onExit={onExit} />
+    <RecallSession
+      deck={deck}
+      cards={cards}
+      mode={mode}
+      uid={uid}
+      yearLevel={yearLevel}
+      onExit={onExit}
+    />
   );
 }
 
@@ -621,12 +631,14 @@ function RecallSession({
   cards,
   mode,
   uid,
+  yearLevel,
   onExit,
 }: {
   deck: Deck;
   cards: Flashcard[];
   mode: "flip" | "write";
   uid: string;
+  yearLevel: YearLevel;
   onExit: () => void;
 }) {
   const [order] = useState(() => [...cards].sort(() => Math.random() - 0.5));
@@ -649,7 +661,7 @@ function RecallSession({
     setTyped("");
     setIndex((i) => i + 1);
     try {
-      await studyFlashcard(uid, deck.id, card, deck.subjectId, deck.topic, g);
+      await studyFlashcard(uid, deck.id, card, deck.subjectId, deck.topic, g, yearLevel);
       await awardXp(uid, "flashcardStudied", "reviews");
     } catch (err) {
       console.error(err);

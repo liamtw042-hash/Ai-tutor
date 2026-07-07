@@ -418,7 +418,12 @@ export default function Practice() {
         awardedMarks: awarded,
         totalMarks: total,
       });
-      await scheduleQuestionReview(profile.uid, q, gotIt);
+      await scheduleQuestionReview(
+        profile.uid,
+        q,
+        gotIt,
+        levelForSubject(profile, q.subjectId),
+      );
       const xp = await awardXp(
         profile.uid,
         gotIt ? "questionCorrect" : "questionAttempted",
