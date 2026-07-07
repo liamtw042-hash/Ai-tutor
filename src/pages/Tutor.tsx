@@ -268,6 +268,8 @@ export default function Tutor() {
 
   // Toggle voice output; when turning on, skip replaying the current backlog.
   const toggleTts = () => {
+    // Unlock synthesis inside this click gesture (required by mobile browsers).
+    synth.unlock();
     setTtsOn((on) => {
       const next = !on;
       if (next) lastSpokenRef.current = messages.length - 1;
@@ -281,6 +283,7 @@ export default function Tutor() {
       recog.stop();
     } else {
       synth.cancel(); // don't talk over the student
+      synth.unlock(); // keep the voice loop working on mobile
       recog.start();
     }
   };
