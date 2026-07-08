@@ -20,7 +20,7 @@ import {
   scheduleQuestionReview,
 } from "@/lib/firestore";
 import { generateQuestions, markWritten } from "@/lib/claude";
-import { canUse, incrementUsage, remaining } from "@/lib/usage";
+import { canUse, incrementUsage, remaining, syncLimitFromError } from "@/lib/usage";
 import {
   type GeneratedQuestion,
   type Question,
@@ -64,6 +64,8 @@ function WrittenPanel({
   onGraded: (fb: WrittenFeedback) => void;
   stage: string;
 }) {
+  const { profile } = useAuth();
+  const uid = profile?.uid ?? "demo";
   const [answer, setAnswer] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
@@ -88,6 +90,7 @@ function WrittenPanel({
       setFb(result);
       onGraded(result);
     } catch (err) {
+      syncLimitFromError(uid, "practice", err);
       setError(
         err instanceof Error
           ? err.message
@@ -258,6 +261,7 @@ function GenerateModal({
       onGenerated(qs);
       onClose();
     } catch (err) {
+      syncLimitFromError(uid, "generate", err);
       setError(
         err instanceof Error
           ? err.message

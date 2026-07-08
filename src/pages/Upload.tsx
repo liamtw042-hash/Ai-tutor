@@ -61,6 +61,7 @@ export default function UploadPage() {
   const [kind, setKind] = useState<"image" | "pdf">("image");
   const [savedUpload, setSavedUpload] = useState<Upload | null>(null);
   const [uploading, setUploading] = useState(false);
+  const [saveFailed, setSaveFailed] = useState(false);
 
   const [action, setAction] = useState<UploadAction>("explain");
   const [askText, setAskText] = useState("");
@@ -113,13 +114,16 @@ export default function UploadPage() {
     // Store it in the student's own space (best-effort; analysis works regardless).
     if (configured && user) {
       setUploading(true);
+      setSaveFailed(false);
       try {
         const rec = await uploadWork(user.uid, picked, subjectId);
         setSavedUpload(rec);
         setHistory((h) => [rec, ...h]);
       } catch (err) {
-        // Non-fatal — they can still analyse the file this session.
+        // Non-fatal — they can still analyse the file this session — but say
+        // so instead of failing silently (e.g. Storage rules not deployed).
         console.error("Upload failed", err);
+        setSaveFailed(true);
       } finally {
         setUploading(false);
       }
@@ -171,6 +175,7 @@ export default function UploadPage() {
     setFile(null);
     setPreviewUrl(null);
     setSavedUpload(null);
+    setSaveFailed(false);
     setResult("");
     setError("");
   };
@@ -304,6 +309,10 @@ export default function UploadPage() {
                       </span>
                     ) : savedUpload ? (
                       <Badge tone="green">Saved to your account</Badge>
+                    ) : saveFailed ? (
+                      <span className="text-xs text-amber-300">
+                        Couldn't save to your library — analysis still works
+                      </span>
                     ) : configured ? null : (
                       <span className="text-xs text-ink-500">
                         Not saved (demo mode) — analysis still works

@@ -1,0 +1,12 @@
+import { readFileSync } from "node:fs";
+import { cert, initializeApp } from "firebase-admin/app";
+import { getAuth } from "firebase-admin/auth";
+import { getFirestore } from "firebase-admin/firestore";
+const env = readFileSync(".env.local", "utf8");
+const svc = JSON.parse(env.split("\n").find(l => l.startsWith("FIREBASE_SERVICE_ACCOUNT=")).slice(25));
+const app = initializeApp({ credential: cert({ projectId: svc.project_id, clientEmail: svc.client_email, privateKey: svc.private_key }) });
+const user = await getAuth(app).getUserByEmail("smaudit1@example.com");
+const val = process.argv[2] === "true";
+await getFirestore(app).doc(`users/${user.uid}`).update({ premium: val });
+console.log("premium =", val);
+process.exit(0);

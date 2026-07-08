@@ -14,7 +14,7 @@ import {
   studyFlashcard,
 } from "@/lib/firestore";
 import { generateFlashcards } from "@/lib/claude";
-import { canUse, incrementUsage, remaining } from "@/lib/usage";
+import { canUse, incrementUsage, remaining, syncLimitFromError } from "@/lib/usage";
 import { DEMO_SUBJECT_IDS, getSubject, topicsForYear } from "@/data/subjects";
 import {
   Badge,
@@ -315,6 +315,7 @@ function CreateDeckModal({
       setName("");
       await onCreated(deckId);
     } catch (err) {
+      syncLimitFromError(uid, "aiDeck", err);
       setError(err instanceof Error ? err.message : "Something went wrong.");
     } finally {
       setBusy(false);

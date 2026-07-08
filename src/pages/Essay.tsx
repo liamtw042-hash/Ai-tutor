@@ -11,7 +11,7 @@ import {
   fetchEssayRecords,
   saveEssayRecord,
 } from "@/lib/firestore";
-import { canUse, incrementUsage, remaining } from "@/lib/usage";
+import { canUse, incrementUsage, remaining, syncLimitFromError } from "@/lib/usage";
 import {
   type EssayFeedback,
   type EssayRecord,
@@ -93,6 +93,7 @@ export default function Essay() {
         fetchEssayRecords(user.uid, 6).then(setHistory).catch(() => undefined);
       }
     } catch (err) {
+      syncLimitFromError(uid, "essay", err);
       setError(
         err instanceof Error
           ? err.message

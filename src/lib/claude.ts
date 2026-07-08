@@ -33,6 +33,15 @@ async function authHeader(): Promise<Record<string, string>> {
   }
 }
 
+/** Error from the API with the HTTP status attached (429 = daily limit). */
+export class ApiError extends Error {
+  status: number;
+  constructor(message: string, status: number) {
+    super(message);
+    this.status = status;
+  }
+}
+
 async function postJSON<T>(url: string, body: unknown): Promise<T> {
   const res = await fetch(url, {
     method: "POST",
@@ -48,8 +57,9 @@ async function postJSON<T>(url: string, body: unknown): Promise<T> {
     }
     // 429 (daily limit) and 401/403 (auth/premium) already carry a clear,
     // user-facing message from the server — surface it as-is.
-    throw new Error(
+    throw new ApiError(
       detail || `Request failed (${res.status}). Is the API deployed?`,
+      res.status,
     );
   }
   return res.json() as Promise<T>;

@@ -28,7 +28,7 @@ import {
 } from "@/lib/firestore";
 import { weakestTopics, type TopicMastery } from "@/lib/mastery";
 import { useSpeechRecognition, useSpeechSynthesis } from "@/lib/speech";
-import { canUse, incrementUsage, remaining } from "@/lib/usage";
+import { canUse, incrementUsage, remaining, syncLimitFromError } from "@/lib/usage";
 import { type ChatMessage, type SubjectId } from "@/types";
 import { stageForSubject } from "@/lib/level";
 
@@ -243,6 +243,7 @@ export default function Tutor() {
             "I couldn't reach my brain just now. The AI tutor runs on a serverless function — make sure the app is deployed with an ANTHROPIC_API_KEY set. Then try again!",
         },
       ]);
+      syncLimitFromError(uid, "tutor", err);
       setError(err instanceof Error ? err.message : "Request failed.");
     } finally {
       setLoading(false);

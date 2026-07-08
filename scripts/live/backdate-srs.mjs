@@ -1,0 +1,14 @@
+import { readFileSync } from "node:fs";
+import { cert, initializeApp } from "firebase-admin/app";
+import { getAuth } from "firebase-admin/auth";
+import { getFirestore } from "firebase-admin/firestore";
+const env = readFileSync(".env.local", "utf8");
+const svc = JSON.parse(env.split("\n").find(l => l.startsWith("FIREBASE_SERVICE_ACCOUNT=")).slice(25));
+const app = initializeApp({ credential: cert({ projectId: svc.project_id, clientEmail: svc.client_email, privateKey: svc.private_key }) });
+const db = getFirestore(app);
+const user = await getAuth(app).getUserByEmail("smaudit1@example.com");
+const today = new Intl.DateTimeFormat("en-CA", { timeZone: "Australia/Sydney", year: "numeric", month: "2-digit", day: "2-digit" }).format(new Date());
+const snap = await db.collection(`users/${user.uid}/srs`).get();
+for (const d of snap.docs) await d.ref.update({ due: today });
+console.log(`backdated ${snap.size} srs items to due=${today}`);
+process.exit(0);

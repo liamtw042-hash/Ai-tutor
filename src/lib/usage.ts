@@ -46,3 +46,23 @@ export function remaining(
 export function canUse(uid: string, kind: UsageKind, premium: boolean): boolean {
   return premium || remaining(uid, kind, premium) > 0;
 }
+
+/**
+ * Keep the local counter honest when the SERVER says the daily limit is hit
+ * (HTTP 429). The localStorage counter only increments on success, so a failed
+ * or aborted request can leave the UI claiming allowance the server will
+ * refuse — sync it to the cap so "N left today" stops overpromising.
+ */
+export function syncLimitFromError(
+  uid: string,
+  kind: UsageKind,
+  err: unknown,
+): void {
+  const status =
+    err && typeof err === "object" && "status" in err
+      ? Number((err as { status: unknown }).status)
+      : undefined;
+  if (status === 429 && typeof localStorage !== "undefined") {
+    localStorage.setItem(storageKey(uid, kind), String(FREE_LIMITS[kind]));
+  }
+}

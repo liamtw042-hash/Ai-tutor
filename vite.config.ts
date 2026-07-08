@@ -12,6 +12,11 @@ export default defineConfig({
   },
   server: {
     port: 5173,
+    // Local stand-in for the Vercel functions: run `npx tsx scripts/dev-api.mjs`
+    // alongside `vite dev` and /api/* is served by the real handlers.
+    proxy: {
+      "/api": "http://localhost:3001",
+    },
   },
   build: {
     rollupOptions: {
